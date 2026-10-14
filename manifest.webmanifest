@@ -1,0 +1,11 @@
+{
+  "name": "良爷工作台",
+  "short_name": "工作台",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#101110",
+  "theme_color": "#101110",
+  "icons": [
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
