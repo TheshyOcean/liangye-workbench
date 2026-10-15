@@ -2630,7 +2630,7 @@ var rafId=null,pending=null;
 var revealN=0, thinkReveal=0, revealT=0, thinkT=0;
 function revealTick(){
   if(rafId) return;
-  rafId=setTimeout(function(){ rafId=null; flush(); },16);
+  rafId=setTimeout(function(){ rafId=null; flush(); },24);   /* 24ms：既流畅又不必每帧解析 markdown */
 }
 function flush(){
   rafId=null;
@@ -2662,7 +2662,13 @@ function flush(){
       revealN=Math.min(full.length,revealN+cps*dtMs/1000);
     }
     var shownN=Math.floor(revealN);
-    if(ans.__n!==shownN){ ans.__n=shownN; ans.textContent=full.slice(0,shownN); }
+    if(ans.__n!==shownN){
+      ans.__n=shownN;
+      /* 关键：流式期间就用 md() 输出排版后的 HTML。
+         以前这里写纯文本，流结束时 renderChat() 才换成 <p>/<ul> —— 那一刻整段重排，
+         就是你看到的"闪/跳"。现在两端产物一致，结束瞬间画面不变。 */
+      ans.innerHTML=md(full.slice(0,shownN));
+    }
     if(revealN<full.length) revealTick();
     if(!bub.querySelector('.caret')) bub.insertAdjacentHTML('beforeend','<span class="caret"></span>');
   }
