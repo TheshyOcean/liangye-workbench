@@ -2893,6 +2893,7 @@ function simReply(conv){
     var c=conv;
     var last=c.msgs[c.msgs.length-1];
     last.stream=true; last.c='';
+    revealN=0; thinkReveal=0;   /* 打字机游标归零 */
     var full=text, pos=0;
     renderChat();
     S.timer=setInterval(function(){
