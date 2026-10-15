@@ -979,10 +979,10 @@ input,textarea,[contenteditable],.bub,.bub *,.think-b,.think-b *{-webkit-user-se
 
 .msg{
   display:flex;gap:11px;max-width:80%;
-  animation:msgIn .26s var(--ease-expo-out) both;
+  animation:none;  /* 关闭 .msg 常驻入场动画：renderChat 全量重建会重播它，导致结束瞬间整屏闪 */
 }
 @keyframes msgIn{from{opacity:0;transform:translateX(-7px);}to{opacity:1;transform:translateX(0);}}
-.msg.me{align-self:flex-end;flex-direction:row-reverse;animation-name:msgInR;}
+.msg.me{align-self:flex-end;flex-direction:row-reverse;}
 @keyframes msgInR{from{opacity:0;transform:translateX(7px);}to{opacity:1;transform:translateX(0);}}
 
 .msg .mini{
@@ -2535,7 +2535,7 @@ function renderChat(){
     var tail=(m.stream?'<span class="caret"></span>':'');
     var think='';
     if(!isMe&&m.th&&m.c){
-      think='<details class="think"'+(m.stream?' open':'')+'><summary>▸ 思考过程 · THINKING · '+m.th.length+' 字</summary><div class="think-b">'+md(m.th)+'</div></details>';
+      think='<details class="think"'+(m.stream||idx===c.msgs.length-1?' open':'')+'><summary>▸ 思考过程 · THINKING · '+m.th.length+' 字</summary><div class="think-b">'+md(m.th)+'</div></details>';
     }
     if(annoHere) html+=renderAnnoBar();
     html+=
@@ -2653,7 +2653,7 @@ function flush(){
     var ans=bub.querySelector('.ans');
     if(!ans){
       bub.textContent='';
-      bub.insertAdjacentHTML('beforeend','<div class="ans"></div>');
+      bub.insertAdjacentHTML('beforeend','<div class="ans"></div><span class="caret"></span><div class="msg-act"><button data-act="copy" data-i="'+idx+'">复制</button><button data-act="anno" data-i="'+idx+'">批注修改</button><button data-act="regen" data-i="'+idx+'">重生成</button></div>');
       (bub.closest('.msg')||bub).classList.add('fresh');   /* 标记整条消息行：重渲染不会命中 */
       ans=bub.querySelector('.ans');
     }
@@ -2706,7 +2706,7 @@ function patchThink(idx,th){
   }
   var shownTh=Math.floor(thinkReveal);
   var shownTxt=ths.slice(0,shownTh);
-  if(tb.__n!==shownTh){ tb.__n=shownTh; tb.textContent=shownTxt; }
+  if(tb.__n!==shownTh){ tb.__n=shownTh; tb.innerHTML=md(shownTxt); }
   if(thinkReveal<ths.length) revealTick();
   var h=tk.querySelector('summary');
   if(h) h.textContent='▸ 思考过程 · THINKING · '+th.length+' 字';
