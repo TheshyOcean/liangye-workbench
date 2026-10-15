@@ -1681,7 +1681,6 @@ html.kb-open .chat{padding-bottom:2px;}
 @keyframes msgLineIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 #chat .msg.ai:last-child .bub .ans > *,
 #chat .msg.ai:last-child .bub .think-b > *{
-  will-change:transform,opacity;
   animation:msgLineIn .75s cubic-bezier(.2,.8,.2,1) both;
 }
 /* 同批段落错开一点，读起来是"流进来"而不是整块同时亮起 */
@@ -1703,20 +1702,20 @@ html.kb-open .chat{padding-bottom:2px;}
   to{opacity:1;transform:none}
 }
 @keyframes lineFadeUp{
-  from{opacity:0;transform:translateY(12px);filter:blur(1.5px)}
+  from{opacity:0;transform:translateY(12px)}
   to{opacity:1;transform:none;filter:blur(0)}
 }
 /* 新出现的 AI 输出框：由上往下揭开（抽屉抽出的感觉） */
 #chat .msg.ai:last-child .bub{
-  transform-origin:top center;backface-visibility:hidden;will-change:transform,opacity;
+  transform-origin:top center;backface-visibility:hidden;
   animation:bubDrawer 1.15s cubic-bezier(.16,.84,.24,1) both;
   /* 弹簧曲线：不支持 linear() 的浏览器自动沿用上面那条 bezier */
   animation-timing-function:linear(0,.1 8%,.4 20%,.72 34%,.92 48%,1.015 62%,1.02 70%,1 84%,.995 92%,1);
 }
 /* 正文与思考过程：由淡到深 + 轻微上浮 */
 #chat .msg.ai .bub .ans,
-#chat .msg.ai:last-child .bub .think-b{will-change:transform,opacity;animation:lineFadeUp 1s cubic-bezier(.2,.8,.2,1) .04s both;animation-timing-function:linear(0,.1 8%,.4 20%,.72 34%,.92 48%,1.015 62%,1.02 70%,1 84%,.995 92%,1);}
-#chat .msg.ai:last-child .bub .ans{will-change:transform,opacity;animation:lineFadeUp 1s cubic-bezier(.2,.8,.2,1) .12s both;animation-timing-function:linear(0,.1 8%,.4 20%,.72 34%,.92 48%,1.015 62%,1.02 70%,1 84%,.995 92%,1);}
+#chat .msg.ai:last-child .bub .think-b{animation:lineFadeUp 1s cubic-bezier(.2,.8,.2,1) .04s both;animation-timing-function:linear(0,.1 8%,.4 20%,.72 34%,.92 48%,1.015 62%,1.02 70%,1 84%,.995 92%,1);}
+#chat .msg.ai:last-child .bub .ans{animation:lineFadeUp 1s cubic-bezier(.2,.8,.2,1) .12s both;animation-timing-function:linear(0,.1 8%,.4 20%,.72 34%,.92 48%,1.015 62%,1.02 70%,1 84%,.995 92%,1);}
 /* 系统若开着「减少动效」，全局规则会把动画压成 0.01ms（这就是"看不到淡入"的原因）。
    这里只为上面这几条显式恢复时长，不碰其它动效。 */
 @media (prefers-reduced-motion: reduce){
@@ -2648,6 +2647,7 @@ function flush(){
       ans=bub.querySelector('.ans');
     }
     var full=String(pending);
+    if(document.hidden) revealN=full.length;
     if(revealN>full.length) revealN=full.length;
     if(revealN<full.length){
       /* 补帧：按"已经过去多少毫秒"推进，字数/秒随积压自适应 → 视觉连续，不再一跳一跳 */
@@ -2657,7 +2657,8 @@ function flush(){
       var cps=Math.min(320,Math.max(45,(full.length-revealN)*6));
       revealN=Math.min(full.length,revealN+cps*dtMs/1000);
     }
-    ans.textContent=full.slice(0,Math.floor(revealN));
+    var shownN=Math.floor(revealN);
+    if(ans.__n!==shownN){ ans.__n=shownN; ans.textContent=full.slice(0,shownN); }
     if(revealN<full.length) revealTick();
     if(!bub.querySelector('.caret')) bub.insertAdjacentHTML('beforeend','<span class="caret"></span>');
   }
@@ -2676,6 +2677,7 @@ function patchThink(idx,th){
   }
   var tb=tk.querySelector('.think-b');
   var ths=String(th);
+  if(document.hidden) thinkReveal=ths.length;
   if(thinkReveal>ths.length) thinkReveal=ths.length;
   if(thinkReveal<ths.length){
     var nowTh=Date.now();
@@ -2684,8 +2686,9 @@ function patchThink(idx,th){
     var cpsTh=Math.min(320,Math.max(45,(ths.length-thinkReveal)*6));
     thinkReveal=Math.min(ths.length,thinkReveal+cpsTh*dtTh/1000);
   }
-  var shownTh=ths.slice(0,Math.floor(thinkReveal));
-  if(tb.textContent!==shownTh) tb.textContent=shownTh;
+  var shownTh=Math.floor(thinkReveal);
+  var shownTxt=ths.slice(0,shownTh);
+  if(tb.__n!==shownTh){ tb.__n=shownTh; tb.textContent=shownTxt; }
   if(thinkReveal<ths.length) revealTick();
   var h=tk.querySelector('summary');
   if(h) h.textContent='▸ 思考过程 · THINKING · '+th.length+' 字';
