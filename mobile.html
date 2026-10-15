@@ -1688,7 +1688,7 @@ html.kb-open .chat{padding-bottom:2px;}
    纯文本被整体替换 —— 观感就是"啪"地跳出来。
    这里让最后一条 AI 消息的格式化内容逐段淡入上浮；
    只作用于最后一条：renderChat() 是全量重渲染，加在全局会让整屏消息一起闪。 */
-@keyframes msgLineIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes msgLineInOff{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .msg.ai .bub.fresh .ans > *,
 .msg.ai .bub.fresh .think-b > *{
   animation:msgLineIn .75s cubic-bezier(.2,.8,.2,1) both;
@@ -1707,11 +1707,11 @@ html.kb-open .chat{padding-bottom:2px;}
 .msg.ai .bub .think > .think-b{transition:opacity .18s ease;}
 
 /* ── 输出框「像从抽屉抽出」+ 文字由淡到深 ───────────────────────── */
-@keyframes bubDrawer{
+@keyframes bubDrawerOff{
   from{opacity:0;transform:translateY(-14px) scaleY(.72)}
   to{opacity:1;transform:none}
 }
-@keyframes lineFadeUp{
+@keyframes lineFadeUpOff{
   from{opacity:0;transform:translateY(12px)}
   to{opacity:1;transform:none;filter:blur(0)}
 }
@@ -1729,7 +1729,7 @@ html.kb-open .chat{padding-bottom:2px;}
 /* 系统若开着「减少动效」，全局规则会把动画压成 0.01ms（这就是"看不到淡入"的原因）。
    这里只为上面这几条显式恢复时长，不碰其它动效。 */
 @media (prefers-reduced-motion: reduce){
-  html:not(.force-motion) .msg.ai .bub.fresh{animation-duration:1.15s !important}
+  html:not(.force-motion) .msg.fresh{animation-duration:.38s !important}
   html:not(.force-motion) .msg.ai .bub.fresh .ans,
   html:not(.force-motion) .msg.ai .bub.fresh .think-b{animation-duration:1s !important}
   html:not(.force-motion) .msg.ai .bub.fresh .ans > *{animation-duration:.75s !important}
@@ -2790,7 +2790,7 @@ function flush(){
     if(!ans){
       bub.textContent='';
       bub.insertAdjacentHTML('beforeend','<div class="ans"></div>');
-      bub.classList.add('fresh');   /* 只在新生气泡上播入场；重渲染不会再命中 */
+      (bub.closest('.msg')||bub).classList.add('fresh');   /* 标记整条消息行：重渲染不会命中 */
       ans=bub.querySelector('.ans');
     }
     var full=String(pending);
@@ -2820,7 +2820,7 @@ function patchThink(idx,th){
   var tk=bub.querySelector('.think');
   if(!tk){
     bub.insertAdjacentHTML('afterbegin','<details class="think" open><summary></summary><div class="think-b"></div></details>');
-    bub.classList.add('fresh');
+    (bub.closest('.msg')||bub).classList.add('fresh');
     tk=bub.querySelector('.think');
   }
   var tb=tk.querySelector('.think-b');
