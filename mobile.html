@@ -1705,6 +1705,29 @@ html.kb-open .chat{padding-bottom:2px;}
 }
 /* 思考块展开/收起也柔一点 */
 .msg.ai .bub .think > .think-b{transition:opacity .18s ease;}
+
+/* ── 输出框「像从抽屉抽出」+ 文字由淡到深 ───────────────────────── */
+@keyframes bubDrawer{
+  from{clip-path:inset(0 0 92% 0);opacity:.35;transform:translateY(-6px)}
+  to{clip-path:inset(0 0 0 0);opacity:1;transform:none}
+}
+@keyframes lineFadeUp{
+  from{opacity:0;transform:translateY(5px);filter:blur(2px)}
+  to{opacity:1;transform:none;filter:blur(0)}
+}
+/* 新出现的 AI 输出框：由上往下揭开（抽屉抽出的感觉） */
+#chat .msg.ai .bub{animation:bubDrawer .5s cubic-bezier(.22,.8,.2,1) both;}
+/* 正文与思考过程：由淡到深 + 轻微上浮 */
+#chat .msg.ai .bub .ans,
+#chat .msg.ai .bub .think-b{animation:lineFadeUp .5s ease-out both;}
+/* 系统若开着「减少动效」，全局规则会把动画压成 0.01ms（这就是"看不到淡入"的原因）。
+   这里只为上面这几条显式恢复时长，不碰其它动效。 */
+@media (prefers-reduced-motion: reduce){
+  html:not(.force-motion) #chat .msg.ai .bub{animation-duration:.5s !important}
+  html:not(.force-motion) #chat .msg.ai .bub .ans,
+  html:not(.force-motion) #chat .msg.ai .bub .think-b{animation-duration:.5s !important}
+  html:not(.force-motion) .msg.ai .bub .caret{animation-duration:1s !important}
+}
 </style>
 <style id="cjk-fix">
 /* ===== CJK 排版修正：中文不用宽字距，英文技术标签保持原样 ===== */
