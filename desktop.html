@@ -1690,7 +1690,7 @@ html.kb-open .chat{padding-bottom:2px;}
 /* 流式光标：从硬闪改成呼吸，进一步减少"跳"的感觉 */
 @keyframes caretPulse{0%,100%{opacity:.22}50%{opacity:1}}
 .msg.ai .bub .caret{
-  display:inline-block;width:7px;height:15px;margin-left:2px;vertical-align:-3px;
+  display:block;height:1lh;line-height:0;width:7px;margin-left:2px;
   background:var(--ac);animation:caretPulse 1.25s ease-in-out infinite;
 }
 /* 思考块展开/收起也柔一点 */
@@ -1698,6 +1698,10 @@ html.kb-open .chat{padding-bottom:2px;}
 
 /* ── 输出框「像从抽屉抽出」+ 文字由淡到深 ───────────────────────── */
 .msg.fresh{animation:msgRowIn .38s cubic-bezier(.21,.9,.28,1) both;}
+/* 【结束不闪】renderChat() 全量重建 DOM 会让每一行重播入场动画（fill-mode:both → 从 opacity:0 开始），
+   屏幕上原本就有的行整屏消失再滑入，就是用户看到的"输出完闪一下"。
+   .settled 只给"重建前已经在屏幕上的行"，让它们直接落到终态；新行照常播放 .msgIn / .msgRowIn。 */
+#chat .msg.settled{animation:none;}
 @keyframes msgRowIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes bubDrawerOff{
   from{opacity:0;transform:translateY(-14px) scaleY(.72)}
@@ -2498,6 +2502,9 @@ function splitThink(t){
 function renderChat(){
   var box=$('chat');
   var c=curConv();
+  /* 【结束不闪】重建前先记下已经在屏幕上的行号 */
+  var _oldRows=[];
+  if(box) box.querySelectorAll('.msg').forEach(function(el){ _oldRows.push(el.getAttribute('data-i')); });
 
   if(!c||!c.msgs.length){
     box.innerHTML=
@@ -2532,7 +2539,7 @@ function renderChat(){
     }
     if(annoHere) html+=renderAnnoBar();
     html+=
-      '<div class="msg '+(isMe?'me':'ai')+'" data-i="'+idx+'">'+
+      '<div class="msg '+(isMe?'me':'ai')+(_oldRows.indexOf(String(idx))<0?'':' settled')+'" data-i="'+idx+'">'+
         '<span class="mini" style="'+(isMe?'':'background:var('+((_ag&&_ag.sig)||'--sig-cyan')+')')+'">'+(isMe?'良':esc((_ag&&_ag.ico)||'AI'))+'</span>'+
         '<div class="bub">'+think+'<div class="ans">'+body+'</div>'+tail+
           '<div class="msg-act">'+
