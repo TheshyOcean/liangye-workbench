@@ -1691,7 +1691,8 @@ html.kb-open .chat{padding-bottom:2px;}
 @keyframes msgLineIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 #chat .msg.ai:last-child .bub .ans > *,
 #chat .msg.ai:last-child .bub .think-b > *{
-  animation:msgLineIn .7s cubic-bezier(.2,.8,.2,1) both;
+  will-change:transform,opacity;
+  animation:msgLineIn .75s cubic-bezier(.2,.8,.2,1) both;
 }
 /* 同批段落错开一点，读起来是"流进来"而不是整块同时亮起 */
 #chat .msg.ai:last-child .bub .ans > *:nth-child(2){animation-delay:.14s}
@@ -1708,19 +1709,24 @@ html.kb-open .chat{padding-bottom:2px;}
 
 /* ── 输出框「像从抽屉抽出」+ 文字由淡到深 ───────────────────────── */
 @keyframes bubDrawer{
-  from{clip-path:inset(0 0 100% 0);opacity:0;transform:translateY(-10px)}
-  to{clip-path:inset(0 0 0 0);opacity:1;transform:none}
+  from{opacity:0;transform:translateY(-14px) scaleY(.72)}
+  to{opacity:1;transform:none}
 }
 @keyframes lineFadeUp{
-  from{opacity:0;transform:translateY(10px);filter:blur(4px)}
+  from{opacity:0;transform:translateY(12px);filter:blur(1.5px)}
   to{opacity:1;transform:none;filter:blur(0)}
 }
 /* 新出现的 AI 输出框：由上往下揭开（抽屉抽出的感觉） */
-#chat .msg.ai:last-child .bub{animation:bubDrawer 1.05s cubic-bezier(.16,.84,.24,1) both;}
+#chat .msg.ai:last-child .bub{
+  transform-origin:top center;backface-visibility:hidden;will-change:transform,opacity;
+  animation:bubDrawer 1.15s cubic-bezier(.16,.84,.24,1) both;
+  /* 弹簧曲线：不支持 linear() 的浏览器自动沿用上面那条 bezier */
+  animation-timing-function:linear(0,.1 8%,.4 20%,.72 34%,.92 48%,1.015 62%,1.02 70%,1 84%,.995 92%,1);
+}
 /* 正文与思考过程：由淡到深 + 轻微上浮 */
 #chat .msg.ai .bub .ans,
-#chat .msg.ai:last-child .bub .think-b{animation:lineFadeUp .95s cubic-bezier(.2,.8,.2,1) .05s both;}
-#chat .msg.ai:last-child .bub .ans{animation:lineFadeUp .95s cubic-bezier(.2,.8,.2,1) .14s both;}
+#chat .msg.ai:last-child .bub .think-b{will-change:transform,opacity;animation:lineFadeUp 1s cubic-bezier(.2,.8,.2,1) .04s both;animation-timing-function:linear(0,.1 8%,.4 20%,.72 34%,.92 48%,1.015 62%,1.02 70%,1 84%,.995 92%,1);}
+#chat .msg.ai:last-child .bub .ans{will-change:transform,opacity;animation:lineFadeUp 1s cubic-bezier(.2,.8,.2,1) .12s both;animation-timing-function:linear(0,.1 8%,.4 20%,.72 34%,.92 48%,1.015 62%,1.02 70%,1 84%,.995 92%,1);}
 /* 系统若开着「减少动效」，全局规则会把动画压成 0.01ms（这就是"看不到淡入"的原因）。
    这里只为上面这几条显式恢复时长，不碰其它动效。 */
 @media (prefers-reduced-motion: reduce){
@@ -2765,10 +2771,10 @@ ta.addEventListener('keydown',function(e){
 var rafId=null,pending=null;
 /* v2 流式增量渲染：只 patch 正在流式的那一条气泡。
    原先每个分片都 renderChat()（全量 markdown 解析 + 强制滚底），长对话在手机上必掉帧。 */
-var revealN=0, thinkReveal=0;
+var revealN=0, thinkReveal=0, revealT=0, thinkT=0;
 function revealTick(){
   if(rafId) return;
-  rafId=setTimeout(function(){ rafId=null; flush(); },26);
+  rafId=setTimeout(function(){ rafId=null; flush(); },16);
 }
 function flush(){
   rafId=null;
@@ -2790,10 +2796,14 @@ function flush(){
     var full=String(pending);
     if(revealN>full.length) revealN=full.length;
     if(revealN<full.length){
-      var step=Math.max(5,Math.ceil((full.length-revealN)/7));
-      revealN=Math.min(full.length,revealN+step);
+      /* 补帧：按"已经过去多少毫秒"推进，字数/秒随积压自适应 → 视觉连续，不再一跳一跳 */
+      var nowMs=Date.now();
+      if(!revealT) revealT=nowMs;
+      var dtMs=Math.max(0,nowMs-revealT); revealT=nowMs;
+      var cps=Math.min(320,Math.max(45,(full.length-revealN)*6));
+      revealN=Math.min(full.length,revealN+cps*dtMs/1000);
     }
-    ans.textContent=full.slice(0,revealN);
+    ans.textContent=full.slice(0,Math.floor(revealN));
     if(revealN<full.length) revealTick();
     if(!bub.querySelector('.caret')) bub.insertAdjacentHTML('beforeend','<span class="caret"></span>');
   }
@@ -2814,10 +2824,13 @@ function patchThink(idx,th){
   var ths=String(th);
   if(thinkReveal>ths.length) thinkReveal=ths.length;
   if(thinkReveal<ths.length){
-    var tstep=Math.max(6,Math.ceil((ths.length-thinkReveal)/7));
-    thinkReveal=Math.min(ths.length,thinkReveal+tstep);
+    var nowTh=Date.now();
+    if(!thinkT) thinkT=nowTh;
+    var dtTh=Math.max(0,nowTh-thinkT); thinkT=nowTh;
+    var cpsTh=Math.min(320,Math.max(45,(ths.length-thinkReveal)*6));
+    thinkReveal=Math.min(ths.length,thinkReveal+cpsTh*dtTh/1000);
   }
-  var shownTh=ths.slice(0,thinkReveal);
+  var shownTh=ths.slice(0,Math.floor(thinkReveal));
   if(tb.textContent!==shownTh) tb.textContent=shownTh;
   if(thinkReveal<ths.length) revealTick();
   var h=tk.querySelector('summary');
