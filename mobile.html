@@ -1707,6 +1707,8 @@ html.kb-open .chat{padding-bottom:2px;}
 .msg.ai .bub .think > .think-b{transition:opacity .18s ease;}
 
 /* ── 输出框「像从抽屉抽出」+ 文字由淡到深 ───────────────────────── */
+.msg.fresh{animation:msgRowIn .38s cubic-bezier(.21,.9,.28,1) both;}
+@keyframes msgRowIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes bubDrawerOff{
   from{opacity:0;transform:translateY(-14px) scaleY(.72)}
   to{opacity:1;transform:none}
@@ -1733,6 +1735,7 @@ html.kb-open .chat{padding-bottom:2px;}
   html:not(.force-motion) .msg.ai .bub.fresh .ans,
   html:not(.force-motion) .msg.ai .bub.fresh .think-b{animation-duration:1s !important}
   html:not(.force-motion) .msg.ai .bub.fresh .ans > *{animation-duration:.75s !important}
+  html:not(.force-motion) .msg.fresh{animation-duration:.38s !important}
   html:not(.force-motion) .msg.ai .bub .caret{animation-duration:1.25s !important}
 }
 </style>
