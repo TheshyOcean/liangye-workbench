@@ -2594,6 +2594,11 @@ ta.addEventListener('keydown',function(e){
 var rafId=null,pending=null;
 /* v2 流式增量渲染：只 patch 正在流式的那一条气泡。
    原先每个分片都 renderChat()（全量 markdown 解析 + 强制滚底），长对话在手机上必掉帧。 */
+var revealN=0, thinkReveal=0;
+function revealTick(){
+  if(rafId) return;
+  rafId=setTimeout(function(){ rafId=null; flush(); },26);
+}
 function flush(){
   rafId=null;
   var c=curConv();
@@ -2611,7 +2616,14 @@ function flush(){
       bub.insertAdjacentHTML('beforeend','<div class="ans"></div>');
       ans=bub.querySelector('.ans');
     }
-    ans.textContent=pending;
+    var full=String(pending);
+    if(revealN>full.length) revealN=full.length;
+    if(revealN<full.length){
+      var step=Math.max(6,Math.ceil((full.length-revealN)/5));
+      revealN=Math.min(full.length,revealN+step);
+    }
+    ans.textContent=full.slice(0,revealN);
+    if(revealN<full.length) revealTick();
     if(!bub.querySelector('.caret')) bub.insertAdjacentHTML('beforeend','<span class="caret"></span>');
   }
   if(last.th) patchThink(idx,last.th);
@@ -2628,7 +2640,15 @@ function patchThink(idx,th){
     tk=bub.querySelector('.think');
   }
   var tb=tk.querySelector('.think-b');
-  if(tb.textContent!==th) tb.textContent=th;
+  var ths=String(th);
+  if(thinkReveal>ths.length) thinkReveal=ths.length;
+  if(thinkReveal<ths.length){
+    var tstep=Math.max(8,Math.ceil((ths.length-thinkReveal)/5));
+    thinkReveal=Math.min(ths.length,thinkReveal+tstep);
+  }
+  var shownTh=ths.slice(0,thinkReveal);
+  if(tb.textContent!==shownTh) tb.textContent=shownTh;
+  if(thinkReveal<ths.length) revealTick();
   var h=tk.querySelector('summary');
   if(h) h.textContent='▸ 思考过程 · THINKING · '+th.length+' 字';
 }
