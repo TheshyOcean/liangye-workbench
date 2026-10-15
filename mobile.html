@@ -1577,7 +1577,17 @@ html,body{max-width:100%;overflow-x:hidden;}
 /* ---------- 20. iOS 键盘 / 中文输入法适配（v3） ---------- */
 :root{--kb:0px;}
 /* 键盘弹出：界面尺寸不变，整体上移被遮挡的高度，输入框始终贴着键盘上沿 */
-html.kb-open .app{transform:translate3d(0,calc(-1 * var(--kb,0px)),0);transition:none;}
+html.kb-open.view-chat .app{transform:translate3d(0,calc(-1 * var(--kb,0px)),0);transition:none;}
+/* 配置页键盘适配：绝不整体上移 —— 上移会把正在编辑的输入框顶出可视区，
+   而且 iOS 在 transform 容器里长按的「粘贴」浮层定位会失效（表现为"没法粘贴"）。
+   改为：给滚动容器留出键盘高度的内边距 + 聚焦时滚动定位。 */
+html.kb-open.view-cfg .app{transform:none;}
+html.kb-open.view-cfg .cfg-body{padding-bottom:calc(var(--kb,0px) + 28px);}
+html.kb-open.view-cfg .view-head{position:relative;z-index:3;background:var(--bg);}
+/* API 密钥一键操作条 */
+.key-tools{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+.key-tools .mini-btn{flex:none;}
+.key-hint{font-size:12px;color:var(--tx-3);letter-spacing:.02em;}
 /* 技能 chips 与上下文条保持可见（布局高度未被压缩，不需要牺牲它们） */
 html.kb-open .composer{padding-bottom:8px;}  /* 键盘上方不需要给 Home 指示条留白 */
 html.kb-open .chat{padding-bottom:2px;}
@@ -2058,7 +2068,13 @@ html.kb-open .chat{padding-bottom:2px;}
         <div class="cfg-body as-scroll">
           <div class="cfg-sec">
             <div class="cfg-label"><span class="sq"></span>API 密钥 / Credential</div>
-            <input class="fld" id="apiKey" type="password" placeholder="sk-…" autocomplete="off">
+            <input class="fld" id="apiKey" type="password" placeholder="sk-…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <div class="key-tools">
+              <button class="mini-btn" id="btnPasteKey" type="button">粘贴</button>
+              <button class="mini-btn" id="btnRevealKey" type="button">显示</button>
+              <button class="mini-btn" id="btnClearKey" type="button">清空</button>
+              <span class="key-hint" id="keyHint"></span>
+            </div>
             <div class="row" style="margin-top:8px">
               <span class="ico" style="background:var(--sig-blue)">D</span>
               <span class="row-main">
@@ -2410,6 +2426,9 @@ function toast(msg){
    ============================================================ */
 function showView(id){
   $$('.view').forEach(function(v){ v.classList.toggle('active',v.id===id); });
+  var _r=document.documentElement;
+  _r.classList.toggle('view-chat',id==='v-chat');
+  _r.classList.toggle('view-cfg',id==='v-cfg');
   $$('.rail-btn').forEach(function(b){ b.classList.toggle('active',b.dataset.go===id); });
 }
 
@@ -3652,8 +3671,75 @@ function computeViewport(){
   root.style.setProperty('--vvh',baseH+'px');
   root.style.setProperty('--kb',kb+'px');
   root.classList.toggle('kb-open',kb>0);
+  keepCfgFieldVisible();
   if(kb>0){ autosize(); }
 }
+
+/* ==========================================================================
+   配置页键盘适配 + API 密钥一键操作
+   —— 之前键盘一弹出就把整个 app 上移，导致两个问题：
+      ① 正在编辑的输入框被顶出可视区（表现为"键盘一打开就被遮住"）
+      ② iOS 在 transform 容器里长按的「粘贴」浮层定位失效（表现为"没法粘贴"）
+      现在配置页不再整体上移，改为聚焦时把字段滚到可视区中间，并提供一键粘贴。
+   ========================================================================== */
+function keepCfgFieldVisible(){
+  if(!document.documentElement.classList.contains('view-cfg')) return;
+  var a=document.activeElement;
+  if(!a||!a.tagName||!/^(INPUT|TEXTAREA)$/.test(a.tagName)) return;
+  if(!a.closest||!a.closest('.cfg-body')) return;
+  var go=function(){
+    try{ a.scrollIntoView({block:'center',behavior:'smooth'}); }
+    catch(e){ try{ a.scrollIntoView(); }catch(e2){} }
+  };
+  go(); setTimeout(go,180); setTimeout(go,420);
+}
+document.addEventListener('focusin',keepCfgFieldVisible,true);
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t&&t.closest&&t.closest('.cfg-body')) setTimeout(keepCfgFieldVisible,150);
+},true);
+if(window.visualViewport) window.visualViewport.addEventListener('resize',keepCfgFieldVisible,{passive:true});
+
+(function(){
+  var btnP=$('btnPasteKey'), btnR=$('btnRevealKey'), btnC=$('btnClearKey'), hint=$('keyHint');
+  function say(t){
+    if(!hint) return;
+    hint.textContent=t; clearTimeout(say._t);
+    say._t=setTimeout(function(){ hint.textContent=''; },2800);
+  }
+  function put(t){
+    t=String(t==null?'':t).trim();
+    if(!t){ toast('剪贴板里没有文字'); say('剪贴板为空'); return; }
+    var el=$('apiKey'); if(!el) return;
+    el.value=t;
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+    toast('已粘贴 '+t.length+' 个字符 · 点「保存」生效');
+    say('已粘贴 '+t.length+' 字符');
+  }
+  if(btnP) btnP.addEventListener('click',function(){
+    if(navigator.clipboard&&navigator.clipboard.readText){
+      navigator.clipboard.readText().then(put,function(){
+        toast('系统未允许读取剪贴板 · 请长按输入框选「粘贴」');
+        say('未授权，改用长按粘贴');
+      });
+    }else{
+      var el=$('apiKey'); if(el) el.focus();
+      toast('此浏览器不支持一键粘贴 · 请长按输入框选「粘贴」');
+      say('请长按粘贴');
+    }
+  });
+  if(btnR) btnR.addEventListener('click',function(){
+    var el=$('apiKey'); if(!el) return;
+    var show=(el.type==='password');
+    el.type=show?'text':'password';
+    btnR.textContent=show?'隐藏':'显示';
+    say(show?'已显示明文，注意旁人':'已遮蔽');
+  });
+  if(btnC) btnC.addEventListener('click',function(){
+    var el=$('apiKey'); if(!el) return;
+    el.value=''; el.focus(); toast('已清空（记得点「保存」）');
+  });
+})();
 /* 用时间戳节流而不是 rAF 合并：
    rAF 可能因为页面不可见/系统动画被吞掉，一旦吞掉就会永久卡住后面的同步
    （表现为键盘收起后界面还停在上移状态）。40ms 合并已足够吸收输入法的高频事件。 */
