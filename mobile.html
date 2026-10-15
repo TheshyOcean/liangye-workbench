@@ -1716,7 +1716,7 @@ html.kb-open .chat{padding-bottom:2px;}
   to{opacity:1;transform:none;filter:blur(0)}
 }
 /* 新出现的 AI 输出框：由上往下揭开（抽屉抽出的感觉） */
-#chat .msg.ai:last-child .bub{
+.msg.ai .bub.fresh{
   transform-origin:top center;backface-visibility:hidden;
   animation:bubDrawer 1.15s cubic-bezier(.16,.84,.24,1) both;
   /* 弹簧曲线：不支持 linear() 的浏览器自动沿用上面那条 bezier */
