@@ -1681,6 +1681,30 @@ html.kb-open .chat{padding-bottom:2px;}
 }
 #selBar button:hover{color:var(--ac-ink);background:var(--ac);}
 :root[data-theme="light"] #selBar{box-shadow:4px 4px 0 rgba(16,17,16,.18);}
+
+/* AI 回复渐入：消除「流式慢慢输出 → 结束时突然乍现」
+   现状：流式期间 .ans / .think-b 里是纯文本（每 80ms 整体重写一次），
+   流结束时 renderChat() 把整条消息重渲染成带格式的 markdown（<p>/<ul>），
+   纯文本被整体替换 —— 观感就是"啪"地跳出来。
+   这里让最后一条 AI 消息的格式化内容逐段淡入上浮；
+   只作用于最后一条：renderChat() 是全量重渲染，加在全局会让整屏消息一起闪。 */
+@keyframes msgLineIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+#chat .msg.ai:last-child .bub .ans > *,
+#chat .msg.ai:last-child .bub .think-b > *{
+  animation:msgLineIn .26s cubic-bezier(.22,.8,.2,1) both;
+}
+/* 同批段落错开一点，读起来是"流进来"而不是整块同时亮起 */
+#chat .msg.ai:last-child .bub .ans > *:nth-child(2){animation-delay:.05s}
+#chat .msg.ai:last-child .bub .ans > *:nth-child(3){animation-delay:.1s}
+#chat .msg.ai:last-child .bub .ans > *:nth-child(n+4){animation-delay:.15s}
+/* 流式光标：从硬闪改成呼吸，进一步减少"跳"的感觉 */
+@keyframes caretPulse{0%,100%{opacity:.22}50%{opacity:1}}
+.msg.ai .bub .caret{
+  display:inline-block;width:7px;height:15px;margin-left:2px;vertical-align:-3px;
+  background:var(--ac);animation:caretPulse 1s ease-in-out infinite;
+}
+/* 思考块展开/收起也柔一点 */
+.msg.ai .bub .think > .think-b{transition:opacity .18s ease;}
 </style>
 <style id="cjk-fix">
 /* ===== CJK 排版修正：中文不用宽字距，英文技术标签保持原样 ===== */
