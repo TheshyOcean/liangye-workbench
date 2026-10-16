@@ -4205,7 +4205,7 @@ $('chat').addEventListener('click',function(e){
 
 /* 版本切换：手机版 ↔ 电脑版（走路由页 index.html） */
 on('btnSwitchMode','click',function(){
-  try{ localStorage.setItem('liangye_mode','mobile'); }catch(e){}
+  try{ localStorage.setItem('tows_mode','mobile'); }catch(e){}
   if(/^https?:/.test(location.protocol)) location.href='./';
   else toast('本地文件打开时无法自动切换，请直接打开手机版文件');
 });

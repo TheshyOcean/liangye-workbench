@@ -519,22 +519,22 @@ button:active{transform:translateY(1px)}
    纯色饱和块会显土，所以底色只用 15% 同色相，字形才吃满色。 */
 :root{
   --i1:#4EA8FF; --i2:#22D3EE; --i3:#FBBF24; --i4:#34D399;
-  --i5:#A78BFA; --i6:#FB7185; --i7:#FB923C; --i8:#E879F9;
+  --i5:#A78BFA; --i6:#FB7185; --i7:#FB923C; --i8:#E879F9; --i9:#94A3B8;
 }
 :root[data-theme="light"]{
   --i1:#1D6FD0; --i2:#0E8FA8; --i3:#A96F0A; --i4:#12855F;
-  --i5:#6D4BD1; --i6:#D6475F; --i7:#C2600F; --i8:#A93BC4;
+  --i5:#6D4BD1; --i6:#D6475F; --i7:#C2600F; --i8:#A93BC4; --i9:#5A6673;
 }
-.cfg-body .row .ico{
+.row .ico{
   width:30px;height:30px;
-  color:var(--c,var(--tx-2));
+  color:var(--c,var(--bg-1));
   background:color-mix(in srgb,var(--c,transparent) 15%,transparent);
   border:1px solid color-mix(in srgb,var(--c,transparent) 34%,transparent);
   clip-path:var(--chamfer-2-sm);
   transition:background .18s ease,border-color .18s ease;
 }
-.cfg-body .row .ico svg{width:16px;height:16px;stroke-width:1.7}
-.cfg-body .row.tap:hover .ico{
+.row .ico svg{width:16px;height:16px;stroke-width:1.7}
+.row.tap:hover .ico{
   background:color-mix(in srgb,var(--c,transparent) 26%,transparent);
   border-color:color-mix(in srgb,var(--c,transparent) 55%,transparent);
 }

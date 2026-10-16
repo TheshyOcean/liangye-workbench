@@ -95,7 +95,7 @@ h1{font-size:25px;margin:15px 0 10px}.eyebrow{color:var(--tx2)}
   var V={ desktop:'desktop.html', mobile:'mobile.html' };
   /* ↑↑↑ 用单文件版就改成 'index1.html' / 'index2.html' ↑↑↑ */
 
-  var KEY='liangye_mode';
+  var KEY='tows_mode';          /* 换键：丢掉旧品牌时期残留的 desktop 选择 */
   var ua=navigator.userAgent||'';
   var coarse=false, fine=false;
   try{ coarse=window.matchMedia('(pointer:coarse)').matches; }catch(e){}
@@ -116,6 +116,8 @@ h1{font-size:25px;margin:15px 0 10px}.eyebrow{color:var(--tx2)}
 
   var isPhone  = /Android.*Mobile|iPhone|iPod|Windows Phone|HarmonyOS.*Mobile|Mobile Safari/i.test(ua);
   var isTablet = /iPad|Tablet|PlayBook|Silk|Android(?!.*Mobile)|Macintosh(?=.*Mobile)/i.test(ua);
+  /* 桌面 UA 但屏幕明显是手机尺寸 + 触屏 → 多半是手机开了「桌面版网站」，仍按手机处理 */
+  var smallScreen = Math.min(screen.width||9999, screen.height||9999) <= 500;
 
   var saved=ls(KEY);
   var mode=saved;
@@ -123,6 +125,7 @@ h1{font-size:25px;margin:15px 0 10px}.eyebrow{color:var(--tx2)}
     if(isTablet) mode=null;                        /* 平板两种都合适 → 让用户选 */
     else if(isPhone) mode='mobile';
     else if(coarse&&!fine) mode='mobile';          /* 触屏且无精确指针 → 手机 */
+    else if(coarse&&smallScreen) mode='mobile';    /* 触屏小屏 → 手机 */
     else mode='desktop';
   }
 

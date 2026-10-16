@@ -29,8 +29,11 @@
     pulse:'<path d="M2 12h4.4l2.6-6.6 4.6 13.2 2.5-6.6H22"/>',
     swap:'<path d="M3.5 8.5h14l-3.5-3.5"/><path d="M20.5 15.5h-14l3.5 3.5"/>',
     sync:'<path d="M12 3.5v9M12 3.5 8.5 7M12 3.5 15.5 7"/><path d="M12 20.5v-9M12 20.5 8.5 17M12 20.5l3.5-3.5"/>',
+    info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.6v.1"/>',
+    orbit:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v3M12 18.4v3M2.6 12h3M18.4 12h3"/><circle cx="19.6" cy="6.4" r="1.6"/>',
     close:'<path d="m6 6 12 12M18 6 6 18"/>'
   };
+  window.__ENDF_ICON__=svg;   /* 供页面内动态渲染的菜单复用同一套字形 */
   function svg(k){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">'+(icons[k]||icons.settings)+'</svg>';}
   function button(id,label,key,cls){var b=document.createElement('button');b.id=id;b.className=cls||'studio-tool';b.type='button';b.title=label;b.setAttribute('aria-label',label);b.innerHTML=svg(key)+'<span>'+label+'</span>';return b;}
   function click(id){var e=document.getElementById(id);if(e)e.click();}

@@ -4431,9 +4431,11 @@ on('btnNewChatTop','click',function(){
   showView('v-chat');
   toast('新建对话');
 });
+var HUB_GLYPH={cfg:'key',model:'model',skills:'skill',agents:'person',history:'history',theme:'sun',motion:'orbit',switch:'swap',about:'info'};
 function hubRow(k,ico,sig,title,sub){
+  var fn=window.__ENDF_ICON__,g=(fn&&HUB_GLYPH[k])?fn(HUB_GLYPH[k]):'';
   return '<div class="row tap" data-hub="'+k+'" style="cursor:pointer">'+
-    '<span class="ico" style="--c:var('+sig+')">'+ico+'</span>'+
+    '<span class="ico" style="--c:var('+sig+')">'+(g||ico)+'</span>'+
     '<span class="row-main"><span class="row-ttl">'+esc(title)+'</span>'+
       (sub?'<span class="row-sub">'+esc(sub)+'</span>':'')+'</span>'+
   '</div>';
@@ -4442,15 +4444,15 @@ function openHub(){
   var onSkills=(S.skills||[]).filter(function(s){ return s.on; }).length;
   var ag=activeAgent();
   var html=
-    hubRow('cfg','⚙','--sig-blue','配置 / API 密钥', S.apiKey?('已配置 · '+(S.provider||'')+' / '+(S.model||'')):'未配置，点这里填入密钥')+
-    hubRow('model','M','--sig-cyan','切换模型', S.model||'')+
-    hubRow('skills','技','--sig-green','技能 / Skills', onSkills+' 项已启用 · 共 '+(S.skills||[]).length+' 项')+
-    hubRow('agents','人','--sig-pink','智能体 / Agents', (ag&&ag.name)||'')+
-    hubRow('history','≡','--sig-steel','聊天记录', (S.convs||[]).length+' 个会话')+
-    hubRow('theme','◐','--sig-purple','切换主题', themeLabel(S.theme))+
-    hubRow('motion','⊕','--sig-orange','重力跟随 / 动效', (S.motionOn&&!reduced)?'已开启':'已关闭')+
-    hubRow('switch','⇄','--sig-steel','切换版本','当前为手机版 · 点此改用电脑版')+
-    hubRow('about','i','--sig-steel','关于','TO WRITING STUDIO · To写作工作台');
+    hubRow('cfg','⚙','--i1','配置 / API 密钥', S.apiKey?('已配置 · '+(S.provider||'')+' / '+(S.model||'')):'未配置，点这里填入密钥')+
+    hubRow('model','M','--i2','切换模型', S.model||'')+
+    hubRow('skills','技','--i4','技能 / Skills', onSkills+' 项已启用 · 共 '+(S.skills||[]).length+' 项')+
+    hubRow('agents','人','--i8','智能体 / Agents', (ag&&ag.name)||'')+
+    hubRow('history','≡','--i5','聊天记录', (S.convs||[]).length+' 个会话')+
+    hubRow('theme','◐','--i3','切换主题', themeLabel(S.theme))+
+    hubRow('motion','⊕','--i6','重力跟随 / 动效', (S.motionOn&&!reduced)?'已开启':'已关闭')+
+    hubRow('switch','⇄','--i7','切换版本','当前为手机版 · 点此改用电脑版')+
+    hubRow('about','i','--i9','关于','TO WRITING STUDIO · To写作工作台');
   var w=overlaySheet('功能 / Menu','',html);
   $$('#sheetDyn [data-hub]').forEach(function(el){
     el.addEventListener('click',function(){
@@ -4476,7 +4478,7 @@ function openHub(){
       else if(k==='motion'){ var mb=$('motionBtn'); if(mb) mb.click(); }
       else if(k==='about'){ toast('TO WRITING STUDIO · To写作工作台 · 手机版'); }
       else if(k==='switch'){
-        try{ localStorage.setItem('liangye_mode','desktop'); }catch(e){}
+        try{ localStorage.setItem('tows_mode','desktop'); }catch(e){}
         if(/^https?:/.test(location.protocol)) location.href='./'; else toast('本地文件打开时无法自动切换，请直接打开对应版本的文件');
       }
     });
