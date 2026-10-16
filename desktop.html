@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN" data-theme="dark" data-shell="desktop">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
@@ -1849,7 +1849,9 @@ html.kb-open .chat{padding-bottom:2px;}
   .anno-bar{padding:10px 12px;}
   .anno-item i{max-width:110px;}
 }
-</style></head>
+</style>
+<link rel="stylesheet" href="terminal-redesign.css">
+</head>
 <body class="is-loading">
 
 <!-- ============ 全局底纹 ============ -->
@@ -1876,7 +1878,7 @@ html.kb-open .chat{padding-bottom:2px;}
         <div class="ld-status">
           <span>STATUS <b id="ldState">INITIALIZING</b></span>
           <span>MODULE <b>04 / 04</b></span>
-          <span>BUILD <b>2.0.0-ENDF</b></span>
+          <span>BUILD <b>beta2.0.04</b></span>
         </div>
       </div>
       <div class="ld-track"><i id="ldFill"></i></div>
@@ -2098,6 +2100,13 @@ html.kb-open .chat{padding-bottom:2px;}
       </section>
 
     </main>
+    <aside class="writing-intel" aria-label="写作工作台说明">
+      <div class="intel-header"><span class="intel-plus">✳</span><span>FIELD NOTES</span><span class="intel-index">/ 03</span></div>
+      <div class="intel-hero"><span class="intel-kicker">WRITER'S TERMINAL · 01</span><strong>把灵感<br>写成世界<span>_</span></strong><p>一个为故事、人物与漫长叙事准备的创作空间。</p></div>
+      <div class="intel-section"><div class="intel-label"><span>01 / 工作流</span><span>WORKFLOW</span></div><div class="intel-step"><b>01</b><span>构思与续写<small>从一句灵感延伸成完整场景</small></span></div><div class="intel-step"><b>02</b><span>打磨与批注<small>选中生成内容，精确修改段落</small></span></div><div class="intel-step"><b>03</b><span>归档与回溯<small>在历史记录中找回每次对话</small></span></div></div>
+      <div class="intel-section intel-keys"><div class="intel-label"><span>02 / 快捷操作</span><span>SHORTCUTS</span></div><div><span>发送消息</span><kbd>ENTER</kbd></div><div><span>输入换行</span><kbd>SHIFT + ENTER</kbd></div></div>
+      <div class="intel-bottom"><span class="intel-signal"></span><span>STORY ENGINE<br><b>READY TO CREATE</b></span><span class="intel-corner">◢</span></div>
+    </aside>
   </div>
 
   <!-- ---------- 底部状态栏 ---------- -->
@@ -2106,7 +2115,7 @@ html.kb-open .chat{padding-bottom:2px;}
     <span class="sb hide-sm">MODEL <b id="sbModel">deepseek-chat</b></span>
     <span class="sp"></span>
     <span class="hz"></span>
-    <span class="sb hide-sm">BUILD <b>2.0.0-ENDF</b></span>
+    <span class="sb hide-sm">BUILD <b>beta2.0.04</b></span>
     <span class="sb">© 良爷工作台</span>
   </footer>
 </div>
@@ -4210,5 +4219,6 @@ window.__ENDF__={S:S,save:save,renderDrawer:renderDrawer,renderChat:renderChat,g
 
 })();
 </script>
+<script src="terminal-redesign.js"></script>
 </body>
 </html>
