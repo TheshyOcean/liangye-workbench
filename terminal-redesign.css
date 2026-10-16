@@ -498,3 +498,17 @@ button:active{transform:translateY(1px)}
   .ctx-ring-fg{transition:none}
 }
 
+/* ===== BRAND / To Writing Studio · 品牌标记 + TO 印章 ===== */
+.brand .mark{width:31px;height:31px;background:transparent;clip-path:none;transform:none;color:var(--tx-1)}
+.brand .mark svg{width:31px;height:31px;display:block}
+.brand .name{white-space:nowrap}
+.brand .cn{display:flex;align-items:center;border-left:1px solid var(--bd-s);padding-left:13px;margin-left:3px;color:var(--tx-2)}
+.brand .cn svg{width:24px;height:24px;display:block}
+
+/* 响应式复述（必须留在上面规则之后） */
+@media(max-width:1100px){.brand .cn{display:none}}
+:root[data-shell="mobile"] .brand .cn{display:none}
+:root[data-shell="mobile"] .brand .mark,:root[data-shell="mobile"] .brand .mark svg{width:22px;height:22px}
+:root[data-shell="mobile"] .brand .name{font-size:12px;letter-spacing:.02em}
+@media(max-width:380px){:root[data-shell="mobile"] .brand .name{font-size:11px;letter-spacing:0}}
+@media(max-width:620px){:root[data-shell="desktop"] .brand .name{font-size:14px;letter-spacing:.01em}}

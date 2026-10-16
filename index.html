@@ -6,7 +6,10 @@
 <meta name="theme-color" content="#101110">
 <meta name="color-scheme" content="dark light">
 <meta name="format-detection" content="telephone=no">
-<title>ENDFIELD TERMINAL · 良爷工作台</title>
+<title>To写作工作台 · To Writing Studio</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{
@@ -29,7 +32,7 @@ body{
 .brand{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
 .brand i{width:5px;height:22px;background:var(--ac);display:block;}
 .brand b{font-family:var(--mono);font-size:15px;letter-spacing:.24em;font-weight:900;}
-.brand span{font-size:12px;color:var(--tx3);letter-spacing:.18em;}
+.brand span{font-size:12px;color:var(--tx3);letter-spacing:.14em;white-space:nowrap;}
 .card{border:1px solid var(--bd);background:var(--bg2);padding:20px 18px;clip-path:var(--chamfer);}
 .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--tx3);}
 h1{font-size:19px;font-weight:700;margin:8px 0 6px;letter-spacing:.01em;}
@@ -57,19 +60,21 @@ p.sub{font-size:13px;line-height:1.7;color:var(--tx2);}
 :root{--bg:#171918;--bg2:#1e211f;--tx:#eff0e7;--tx2:#a8ada6;--tx3:#80877f;--ac:#e5f24a;--bd:#373d36;--bds:#596152}
 :root[data-theme="light"]{--bg:#eaece5;--bg2:#f6f6f0;--tx:#20271e;--tx2:#545f4f;--tx3:#6d7767;--ac:#dbec3e;--bd:#c9cec1;--bds:#a3ae93}
 body{background-image:linear-gradient(color-mix(in srgb,var(--tx) 4%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--tx) 4%,transparent) 1px,transparent 1px);background-size:60px 60px}
-.brand b{font-family:"Space Grotesk",sans-serif;font-size:22px;letter-spacing:.04em}
+.brand b{font-family:"Space Grotesk",sans-serif;font-size:17px;letter-spacing:.02em}
+.brand i.mark{width:26px;height:26px;background:none}
+.brand i.mark svg{width:26px;height:26px;display:block}
 .card{padding:30px 27px;border-top:3px solid var(--ac);background:var(--bg2)}
 h1{font-size:25px;margin:15px 0 10px}.eyebrow{color:var(--tx2)}
 .choose button:hover{background:var(--ac);color:#252d13}.choose button:hover em{color:#252d13}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
 <script>
 (function(){var t='auto';try{t=localStorage.getItem('endfield_theme_v2')||'auto';}catch(e){}if(t==='auto')t=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;})();
 </script>
-</style>
 </head>
 <body>
 <div class="wrap">
-  <div class="brand"><i></i><b>ENDFIELD</b><span>良爷工作台</span></div>
+  <div class="brand"><i class="mark"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M0 0h25.5L32 6.5V32H6.5L0 25.5Z" fill="#101110"/><path d="M2.6 2.6h21.7l5.1 5.1v21.7H7.7L2.6 24.3Z" stroke="#fff500" stroke-opacity=".32"/><rect x="5.1" y="8.2" width="15.2" height="3.8" fill="#fff500"/><rect x="10.8" y="8.2" width="3.8" height="14" fill="#fff500"/><circle cx="22.3" cy="19.2" r="3.4" stroke="#00E5FF" stroke-width="2.4"/></svg></i><b>To Writing Studio</b><span>To写作工作台</span></div>
   <div class="card">
     <div class="eyebrow" id="eyebrow">Detecting device</div>
     <h1 id="title">正在识别设备…</h1>

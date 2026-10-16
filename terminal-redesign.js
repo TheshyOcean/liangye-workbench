@@ -42,7 +42,7 @@
     var fresh=button('studioNew','新建对话','plus','studio-new');
     fresh.onclick=function(){click('btnNewChat');};
     rail.insertBefore(fresh,rail.querySelector('.rail-spacer'));
-    var stamp=document.createElement('div');stamp.className='studio-stamp';stamp.innerHTML='<span>LY / STUDIO</span><strong>每一个世界<br>都始于一句话。</strong><i></i><small>CREATIVE OPERATIONS<br>EST. 2026 / LOCAL ARCHIVE</small>';
+    var stamp=document.createElement('div');stamp.className='studio-stamp';stamp.innerHTML='<span>TO / STUDIO</span><strong>每一个世界<br>都始于一句话。</strong><i></i><small>CREATIVE OPERATIONS<br>EST. 2026 / LOCAL ARCHIVE</small>';
     rail.insertBefore(stamp,rail.querySelector('.rail-vert'));
   }
   var top=document.querySelector('.top-right');
@@ -57,10 +57,8 @@
   focus.onclick=toggleFocus;var fn=document.getElementById('studioFocusNav');if(fn)fn.onclick=toggleFocus;
   var theme=document.getElementById('btnTheme');
   if(mobile&&theme){theme.classList.add('studio-mobile-theme');top.insertBefore(theme,focus);}
-  var name=document.querySelector('.brand .cn');if(name)name.textContent='良爷工作台';
   var version=document.createElement('span');version.className='studio-version';version.textContent='beta2.0.04';version.style.cssText='font:9px var(--mono);color:var(--tx-3);margin-left:4px;white-space:nowrap';if(mobile){version.style.fontSize='8px';document.querySelector('#v-chat .sec-head').appendChild(version);}else{document.querySelector('.brand').appendChild(version);}
   var title=document.querySelector('#v-chat .sec-en');if(title)title.textContent='CREATIVE OPERATIONS / WRITING CONSOLE';
-  var mark=document.querySelector('.brand .mark');if(mark)mark.innerHTML='<svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M6 6h28v9H15v19H6V6Z" fill="currentColor"/><path d="m19 19 15 15M27 19l7 7M19 27l7 7" stroke="currentColor" stroke-width="3"/></svg>';
   var composer=document.querySelector('.composer');
   var meta=document.createElement('div');meta.className='studio-input-meta';meta.innerHTML='<span id="studioChars">0 字</span><span>'+(mobile?'写下灵感，或长按正文选择批注':'<kbd>ENTER</kbd> 发送 <i>/</i> <kbd>SHIFT + ENTER</kbd> 换行')+'</span>';
   composer.appendChild(meta);
