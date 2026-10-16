@@ -97,7 +97,7 @@
   new MutationObserver(function(){if(!frame)frame=requestAnimationFrame(enhance);}).observe(chat,{childList:true,subtree:true,characterData:true});enhance();
   function themePaint(){if(theme){var dark=root.dataset.theme==='dark';theme.innerHTML=svg(dark?'sun':'moon');theme.title=dark?'切换日间 / 跟随系统':'切换夜间 / 跟随系统';}root.style.colorScheme=root.dataset.theme;}
   new MutationObserver(themePaint).observe(root,{attributes:true,attributeFilter:['data-theme']});themePaint();
-  document.querySelectorAll('.cfg-sec .row[data-ico] > .ico').forEach(function(e){e.innerHTML=svg(e.parentNode.dataset.ico);e.classList.add('studio-ico');});
+  document.querySelectorAll('.cfg-sec .ico[data-ico]').forEach(function(e){e.innerHTML=svg(e.dataset.ico);e.classList.add('studio-ico');});
   var railButtons=document.querySelectorAll('.rail-btn');railButtons.forEach(function(b){if(b.dataset.go)b.setAttribute('aria-label',b.dataset.go==='v-chat'?'创作对话':'系统配置');});
   /* ---- 侧栏滑动高亮：黄色选中块平滑移动 ---- */
   var navHl=null;
