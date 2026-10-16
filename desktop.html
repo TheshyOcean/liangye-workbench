@@ -2006,7 +2006,7 @@ html.kb-open .chat{padding-bottom:2px;}
             <div class="cfg-label"><span class="sq"></span>API 密钥 / Credential</div>
             <input class="fld" id="apiKey" type="password" placeholder="sk-…" autocomplete="off">
             <div class="row" style="margin-top:8px">
-              <span class="ico" style="background:var(--sig-blue)">D</span>
+              <span class="ico" style="--c:var(--i1)" data-ico="cpu">D</span>
               <span class="row-main">
                 <span class="row-ttl">服务商 <span id="provName">DeepSeek</span></span>
                 <span class="row-sub">模型 <span id="modelName">deepseek-chat</span></span>
@@ -2014,7 +2014,7 @@ html.kb-open .chat{padding-bottom:2px;}
               <button class="mini-btn" id="btnSaveKey">保存</button>
             </div>
             <div class="row" style="margin-top:8px">
-              <span class="ico" style="background:var(--sig-cyan)">↻</span>
+              <span class="ico" style="--c:var(--i2)" data-ico="link">↻</span>
               <span class="row-main">
                 <span class="row-ttl">接口地址 / Endpoint</span>
                 <span class="row-sub" id="baseUrlShow">https://api.deepseek.com/v1</span>
@@ -2025,7 +2025,7 @@ html.kb-open .chat{padding-bottom:2px;}
 
             <!-- v2 正式版：生成参数与联通性自检 -->
             <div class="row" style="margin-top:8px">
-              <span class="ico" style="background:var(--sig-green)">温</span>
+              <span class="ico" style="--c:var(--i3)" data-ico="temp">温</span>
               <span class="row-main">
                 <span class="row-ttl">温度 / Temperature <b id="tempVal" style="color:var(--ac)">0.8</b></span>
                 <span class="row-sub">越高越发散 · 写作建议 0.7 ~ 1.0</span>
@@ -2033,7 +2033,7 @@ html.kb-open .chat{padding-bottom:2px;}
               <input id="tempRange" type="range" min="0" max="1.5" step="0.1" style="width:110px;accent-color:var(--ac)">
             </div>
             <div class="row" style="margin-top:8px">
-              <span class="ico" style="background:var(--sig-orange)">流</span>
+              <span class="ico" style="--c:var(--i4)" data-ico="stream">流</span>
               <span class="row-main">
                 <span class="row-ttl">流式输出 / Streaming</span>
                 <span class="row-sub">关闭则一次性返回全文，长文更省心</span>
@@ -2041,7 +2041,7 @@ html.kb-open .chat{padding-bottom:2px;}
               <button class="mini-btn" id="btnStream">ON</button>
             </div>
             <div class="row" style="margin-top:8px">
-              <span class="ico" style="background:var(--sig-purple)">测</span>
+              <span class="ico" style="--c:var(--i5)" data-ico="pulse">测</span>
               <span class="row-main">
                 <span class="row-ttl">连接测试 / Handshake</span>
                 <span class="row-sub" id="testMsg">未测试</span>
@@ -2049,7 +2049,7 @@ html.kb-open .chat{padding-bottom:2px;}
               <button class="mini-btn" id="btnTest">测试</button>
             </div>
             <div class="row" style="margin-top:8px">
-              <span class="ico" style="background:var(--sig-blue)">商</span>
+              <span class="ico" style="--c:var(--i6)" data-ico="swap">商</span>
               <span class="row-main">
                 <span class="row-ttl">服务商 / Provider</span>
                 <span class="row-sub" id="provHint">切换会同时更换接口地址与候选模型</span>
@@ -2057,7 +2057,7 @@ html.kb-open .chat{padding-bottom:2px;}
               <button class="mini-btn" id="btnProvider">切换</button>
             </div>
             <div class="row" style="margin-top:8px">
-              <span class="ico" style="background:var(--sig-steel)">串</span>
+              <span class="ico" style="--c:var(--i7)" data-ico="sync">串</span>
               <span class="row-main">
                 <span class="row-ttl">配置串 / Sync</span>
                 <span class="row-sub">手机与电脑的配置分开存，用这个互搬</span>
@@ -2080,7 +2080,7 @@ html.kb-open .chat{padding-bottom:2px;}
           <div class="cfg-sec">
             <div class="cfg-label"><span class="sq"></span>基底人设 / Persona</div>
             <div class="row tap" id="btnPersona">
-              <span class="ico" style="background:var(--sig-pink)">人</span>
+              <span class="ico" style="--c:var(--i8)" data-ico="person">人</span>
               <span class="row-main">
                 <span class="row-ttl">平台统一人设</span>
                 <span class="row-sub">Global · 不可删除</span>
@@ -2159,15 +2159,15 @@ html.kb-open .chat{padding-bottom:2px;}
   </div>
   <div class="sheet-body">
     <button class="row tap" style="width:100%" id="actRegen">
-      <span class="ico" style="background:var(--sig-cyan)">↻</span>
+      <span class="ico" style="--c:var(--sig-cyan)">↻</span>
       <span class="row-main"><span class="row-ttl">重新生成</span><span class="row-sub">Regenerate last response</span></span>
     </button>
     <button class="row tap" style="width:100%" id="actUndo">
-      <span class="ico" style="background:var(--sig-orange)">↶</span>
+      <span class="ico" style="--c:var(--sig-orange)">↶</span>
       <span class="row-main"><span class="row-ttl">撤回消息</span><span class="row-sub">Undo last exchange</span></span>
     </button>
     <button class="row tap" style="width:100%" id="actRestart">
-      <span class="ico" style="background:var(--sig-red)">⟲</span>
+      <span class="ico" style="--c:var(--sig-red)">⟲</span>
       <span class="row-main"><span class="row-ttl">重启对话</span><span class="row-sub">Clear current thread</span></span>
     </button>
   </div>
@@ -3088,7 +3088,7 @@ function renderAgents(){
   box.innerHTML=S.agents.map(function(a){
     return ''+
       '<div class="row" style="margin-bottom:8px">'+
-        '<span class="ico" style="background:var('+a.sig+')">'+esc(a.ico||a.name.slice(0,1))+'</span>'+
+        '<span class="ico" style="--c:var('+a.sig+')">'+esc(a.ico||a.name.slice(0,1))+'</span>'+
         '<span class="row-main">'+
           '<span class="row-ttl">'+esc(a.name)+'</span>'+
           '<span class="row-sub">'+esc(a.desc||'')+'</span>'+
@@ -3182,7 +3182,7 @@ function renderSkills(){
   box.innerHTML=S.skills.map(function(s){
     return ''+
       '<div class="row" style="margin-bottom:8px">'+
-        '<span class="ico" style="background:var('+(s.on?'--sig-green':'--sig-steel')+')">'+(s.on?'✓':'○')+'</span>'+
+        '<span class="ico" style="--c:var('+(s.on?'--sig-green':'--sig-steel')+')">'+(s.on?'✓':'○')+'</span>'+
         '<span class="row-main">'+
           '<span class="row-ttl">'+esc(s.name)+'</span>'+
           '<span class="row-sub">'+esc(s.desc||'')+'</span>'+
@@ -3398,10 +3398,10 @@ function openModelPicker(){
       '<span class="row-main"><span class="row-ttl">'+esc(m)+'</span>'+
       (cur?'<span class="row-sub">当前使用</span>':'')+'</span></div>';
   });
-  html+='<div class="row" style="margin-top:8px"><span class="ico" style="background:var(--sig-steel)">✎</span>'+
+  html+='<div class="row" style="margin-top:8px"><span class="ico" style="--c:var(--sig-steel)">✎</span>'+
     '<span class="row-main"><span class="row-ttl">自定义模型 ID</span><span class="row-sub">任何 OpenAI 兼容模型名都能填</span></span>'+
     '<button class="mini-btn" id="mPickCustom">输入</button></div>'+
-    '<div class="row" style="margin-top:6px"><span class="ico" style="background:var(--sig-cyan)">↻</span>'+
+    '<div class="row" style="margin-top:6px"><span class="ico" style="--c:var(--sig-cyan)">↻</span>'+
     '<span class="row-main"><span class="row-ttl">从接口拉取真实列表</span><span class="row-sub">'+esc(S.baseUrl)+'</span></span>'+
     '<button class="mini-btn" id="mPickFetch">拉取</button></div>';
   var w=overlaySheet('选择模型 / Model',S.provider+' · 当前 '+S.model,html);

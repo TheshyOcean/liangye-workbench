@@ -22,6 +22,13 @@
     key:'<circle cx="8" cy="8" r="4"/><path d="m11 11 9 9m-4-4 3-3m-6 0 3-3"/>',
     person:'<circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
     skill:'<path d="m12 2 9 10-9 10-9-10 9-10ZM8 12h8M12 8v8"/>',
+    cpu:'<rect x="7" y="7" width="10" height="10"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/>',
+    link:'<path d="m9.5 14.5 5-5"/><path d="m12.5 6.5 1.8-1.8a4.6 4.6 0 0 1 6.5 6.5l-1.8 1.8"/><path d="m11.5 17.5-1.8 1.8a4.6 4.6 0 0 1-6.5-6.5l1.8-1.8"/>',
+    temp:'<path d="M12 3.2a2.2 2.2 0 0 1 2.2 2.2v8.4a4.1 4.1 0 1 1-4.4 0V5.4A2.2 2.2 0 0 1 12 3.2Z"/><path d="M12 9.5v7.5"/>',
+    stream:'<path d="M3 9c3-3.2 6 3.2 9 0s6-3.2 9 0"/><path d="M3 15c3-3.2 6 3.2 9 0s6-3.2 9 0"/>',
+    pulse:'<path d="M2 12h4.4l2.6-6.6 4.6 13.2 2.5-6.6H22"/>',
+    swap:'<path d="M3.5 8.5h14l-3.5-3.5"/><path d="M20.5 15.5h-14l3.5 3.5"/>',
+    sync:'<path d="M12 3.5v9M12 3.5 8.5 7M12 3.5 15.5 7"/><path d="M12 20.5v-9M12 20.5 8.5 17M12 20.5l3.5-3.5"/>',
     close:'<path d="m6 6 12 12M18 6 6 18"/>'
   };
   function svg(k){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">'+(icons[k]||icons.settings)+'</svg>';}
@@ -90,7 +97,7 @@
   new MutationObserver(function(){if(!frame)frame=requestAnimationFrame(enhance);}).observe(chat,{childList:true,subtree:true,characterData:true});enhance();
   function themePaint(){if(theme){var dark=root.dataset.theme==='dark';theme.innerHTML=svg(dark?'sun':'moon');theme.title=dark?'切换日间 / 跟随系统':'切换夜间 / 跟随系统';}root.style.colorScheme=root.dataset.theme;}
   new MutationObserver(themePaint).observe(root,{attributes:true,attributeFilter:['data-theme']});themePaint();
-  document.querySelectorAll('.cfg-sec .ico').forEach(function(e){var r=e.closest('.row'),k='settings';if(r){if(r.querySelector('#btnSaveKey'))k='key';else if(r.querySelector('#btnEditBase'))k='model';else if(r.id==='btnPersona')k='person';else if(r.querySelector('#btnTest'))k='check';}e.innerHTML=svg(k);e.classList.add('studio-ico');});
+  document.querySelectorAll('.cfg-sec .row[data-ico] > .ico').forEach(function(e){e.innerHTML=svg(e.parentNode.dataset.ico);e.classList.add('studio-ico');});
   var railButtons=document.querySelectorAll('.rail-btn');railButtons.forEach(function(b){if(b.dataset.go)b.setAttribute('aria-label',b.dataset.go==='v-chat'?'创作对话':'系统配置');});
   /* ---- 侧栏滑动高亮：黄色选中块平滑移动 ---- */
   var navHl=null;

@@ -306,7 +306,7 @@ body{letter-spacing:.005em}
 .cfg-body{padding:28px max(24px,calc((100% - 930px)/2)) 40px}
 .cfg-sec{max-width:none;padding:19px 22px;margin-bottom:19px}
 .cfg-label{font:500 11px var(--sans);color:var(--tx-2);letter-spacing:.04em}
-.ico{width:29px;height:29px;clip-path:none;background:var(--bg-4)!important;color:var(--tx-2)}
+.ico{width:29px;height:29px;clip-path:none;color:var(--tx-2)}
 .ico svg{width:15px;height:15px}
 .row-ttl{font-size:12px;font-weight:500}.row-sub{font-size:10px}
 .mini-btn{font-family:var(--sans);font-size:11px;color:var(--tx-1);background:var(--bg-3);clip-path:none;min-height:32px}
@@ -512,3 +512,43 @@ button:active{transform:translateY(1px)}
 :root[data-shell="mobile"] .brand .name{font-size:12px;letter-spacing:.02em}
 @media(max-width:380px){:root[data-shell="mobile"] .brand .name{font-size:11px;letter-spacing:0}}
 @media(max-width:620px){:root[data-shell="desktop"] .brand .name{font-size:14px;letter-spacing:.01em}}
+
+/* ===== 功能图标配色系统 / FUNCTION ICON PALETTE =====
+   双色瓷片：同色相淡底 + 同色相描边 + 同色相字形。
+   每个功能占一个色相，暗色主题取亮色、浅色主题取深色，两边都清晰。
+   纯色饱和块会显土，所以底色只用 15% 同色相，字形才吃满色。 */
+:root{
+  --i1:#4EA8FF; --i2:#22D3EE; --i3:#FBBF24; --i4:#34D399;
+  --i5:#A78BFA; --i6:#FB7185; --i7:#FB923C; --i8:#E879F9;
+}
+:root[data-theme="light"]{
+  --i1:#1D6FD0; --i2:#0E8FA8; --i3:#A96F0A; --i4:#12855F;
+  --i5:#6D4BD1; --i6:#D6475F; --i7:#C2600F; --i8:#A93BC4;
+}
+.cfg-body .row .ico{
+  width:30px;height:30px;
+  color:var(--c,var(--tx-2));
+  background:color-mix(in srgb,var(--c,transparent) 15%,transparent);
+  border:1px solid color-mix(in srgb,var(--c,transparent) 34%,transparent);
+  clip-path:var(--chamfer-2-sm);
+  transition:background .18s ease,border-color .18s ease;
+}
+.cfg-body .row .ico svg{width:16px;height:16px;stroke-width:1.7}
+.cfg-body .row.tap:hover .ico{
+  background:color-mix(in srgb,var(--c,transparent) 26%,transparent);
+  border-color:color-mix(in srgb,var(--c,transparent) 55%,transparent);
+}
+
+/* ==========================================================================
+   移动端技能标签：收成一条轻量横滑带
+   beta2.0.04 为「1K 屏看得清」把标签撑到 42px 高 + 9px 间距，占掉约 51px，
+   在手机上比输入框本身还抢眼。这里收回 27px 高、11.5px 字，只保留
+   左侧信号条 + 选中态，功能一个不少，垂直占用砍掉约三分之一。
+   ========================================================================== */
+:root[data-shell="mobile"] .chip-row{gap:5px;margin-bottom:6px;padding-bottom:0}
+:root[data-shell="mobile"] #skillChips .chip{
+  font-size:11.5px;line-height:1.25;padding:5px 9px;min-height:27px;gap:6px;
+  letter-spacing:.02em;
+}
+:root[data-shell="mobile"] #skillChips .chip::before{width:2.5px;height:9px}
+:root[data-shell="mobile"] #skillChips{max-height:none}
