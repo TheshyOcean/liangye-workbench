@@ -491,3 +491,22 @@
   letter-spacing: .06em; color: var(--tx-3); min-height: 14px;
 }
 .tws-ai-meta.warn{ color: var(--sig-orange, #FB923C); }
+
+/* ============================================================================
+   强调色文字的可读性
+   亮色主题下 --ac 是亮柠檬黄（#dbec3e），当文字色对比度只有 1.1:1，几乎看不见。
+   这里单独定义「可读强调色」：暗色沿用 --ac，亮色换成深橄榄。
+   ========================================================================== */
+:root{ --ac-text: var(--ac); }
+:root[data-theme="light"]{ --ac-text: #5f6a18; }
+
+/* 覆盖前面用 var(--ac) 当文字色的地方 */
+.tws-btn.ai{
+  color: var(--ac-text);
+  background: var(--ac-sub);
+  border-color: color-mix(in srgb, var(--ac-text) 45%, transparent);
+}
+.tws-st.st-final{ color: var(--ac-text); border-color: color-mix(in srgb, var(--ac-text) 45%, transparent); }
+.tws-lore-hint b{ color: var(--ac-text); }
+.tws-ai-out.streaming::after{ color: var(--ac-text); }
+.tws-ch-chip.on{ color: var(--ac-text); border-color: color-mix(in srgb, var(--ac-text) 45%, transparent); }

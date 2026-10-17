@@ -89,7 +89,11 @@
       if (!raw) return false;
       var d = JSON.parse(raw);
       if (!d || typeof d !== 'object') return false;
-      D = Object.assign(blank(), d);
+      /* 必须原地更新：D 被 window.TWS.data.D 引用着，
+         重新赋值会让视图层拿着旧对象，读到空数据（曾经的真 bug） */
+      var fresh = Object.assign(blank(), d);
+      Object.keys(D).forEach(function (k) { delete D[k]; });
+      Object.assign(D, fresh);
       return true;
     } catch (e) { return false; }
   }
