@@ -730,7 +730,9 @@
   position: absolute; left: 0; top: 0; bottom: 0; width: 50%;
   border-radius: 999px; overflow: hidden;
   background-image: linear-gradient(90deg, #9fd456, #d9e84f);
-  transition: width .18s cubic-bezier(.22,.8,.22,1), background-image .3s;
+  /* 不要给 width 加 transition：拖动时每帧都在变，
+     过渡会让填充永远追不上滑块，表现为一卡一卡的闪 */
+  transition: none;
 }
 
 /* 粒子 */
@@ -763,7 +765,6 @@
   width: 24px; height: 24px; margin-top: 3px;
   border-radius: 50%; background: #fff; border: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,.3);
-  transition: transform .16s, box-shadow .16s;
 }
 .tws-pill input[type="range"]:hover::-webkit-slider-thumb{ transform: scale(1.08); }
 .tws-pill input[type="range"]:active::-webkit-slider-thumb{
@@ -798,9 +799,8 @@
 .tws-temp-ticks span:first-child{ text-align: left; }
 .tws-temp-ticks span:last-child{ text-align: right; }
 
-/* ③ 弹层高度与位置稳定（contain:paint 会造成阴影/裁切闪烁，不要加） */
+/* ③ 填充层做 paint 隔离（裁切粒子），但不要 will-change：高频写反而增加合成负担 */
 .tws-pill-fill{
-  will-change: width;
   contain: paint;
 }
 
