@@ -45,14 +45,11 @@
   if(rail&&!mobile){
     var navButtons=rail.querySelectorAll('.rail-btn');
     navButtons[0].innerHTML=svg('pen')+'<span>创作对话</span><small>01</small>';
-    navButtons[1].innerHTML=svg('settings')+'<span>系统配置</span><small>08</small>';
+    navButtons[1].innerHTML=svg('settings')+'<span>系统配置</span><small>07</small>';
     var history=button('studioHistory','对话档案','history','rail-btn studio-nav');
     history.innerHTML=svg('history')+'<span>对话档案</span><small>02</small>';
     history.onclick=function(){click('btnDrawer');};
     rail.insertBefore(history,navButtons[1]);
-    var focusNav=button('studioFocusNav','专注阅读','focus','rail-btn studio-nav');
-    focusNav.innerHTML=svg('focus')+'<span>专注阅读</span><small>03</small>';
-    rail.insertBefore(focusNav,navButtons[1]);
     var fresh=button('studioNew','新建对话','plus','studio-new');
     fresh.onclick=function(){click('btnNewChat');};
     rail.insertBefore(fresh,rail.querySelector('.rail-spacer'));
@@ -66,9 +63,8 @@
     var on=root.classList.toggle('studio-focused');
     focus.setAttribute('aria-pressed',String(on));focus.classList.toggle('on',on);
     focus.setAttribute('aria-label',on?'退出专注阅读':'专注阅读');focus.title=on?'退出专注阅读':'专注阅读';
-    var n=document.getElementById('studioFocusNav');if(n)n.classList.toggle('on',on);
   }
-  focus.onclick=toggleFocus;var fn=document.getElementById('studioFocusNav');if(fn)fn.onclick=toggleFocus;
+  focus.onclick=toggleFocus;
   var theme=document.getElementById('btnTheme');
   if(mobile&&theme){theme.classList.add('studio-mobile-theme');top.insertBefore(theme,focus);}
   var version=document.createElement('span');version.className='studio-version';version.textContent='beta2.0.10';version.style.cssText='font:9px var(--mono);color:var(--tx-3);margin-left:4px;white-space:nowrap';if(mobile){version.style.fontSize='8px';document.querySelector('#v-chat .sec-head').appendChild(version);}else{document.querySelector('.brand').appendChild(version);}

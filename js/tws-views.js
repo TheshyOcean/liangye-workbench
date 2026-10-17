@@ -80,7 +80,7 @@
   var BOOK_HTML =
     '<section class="view" id="v-book">' +
       '<div class="sec-head">' +
-        '<span class="sec-no">04</span>' +
+        '<span class="sec-no">03</span>' +
         '<span class="sec-meta"><span class="sec-en">// Manuscript</span><span class="sec-cn">书稿</span></span>' +
         '<span class="sec-right">' +
           '<span class="chip tws-goal-chip" id="twsGoalChip">今日 0 字</span>' +
@@ -97,7 +97,7 @@
   var LORE_HTML =
     '<section class="view" id="v-lore">' +
       '<div class="sec-head">' +
-        '<span class="sec-no">05</span>' +
+        '<span class="sec-no">04</span>' +
         '<span class="sec-meta"><span class="sec-en">// Lore</span><span class="sec-cn">设定库</span></span>' +
         '<span class="sec-right"><button class="mini-btn" id="twsBtnNewCard">新建卡片</button></span>' +
       '</div>' +
@@ -109,7 +109,7 @@
   var THREADS_HTML =
     '<section class="view" id="v-threads">' +
       '<div class="sec-head">' +
-        '<span class="sec-no">06</span>' +
+        '<span class="sec-no">05</span>' +
         '<span class="sec-meta"><span class="sec-en">// Threads</span><span class="sec-cn">伏笔与时间线</span></span>' +
         '<span class="sec-right"><button class="mini-btn" id="twsBtnNewThread">记一条</button></span>' +
       '</div>' +
@@ -1178,9 +1178,9 @@
     if (!rail || document.getElementById('railBook')) return;
 
     var defs = [
-      ['railBook', '书稿', '04', '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v18H6.5A2.5 2.5 0 0 0 4 23z"/><path d="M8 7h7M8 11h7"/>', 'v-book'],
-      ['railLore', '设定库', '05', '<path d="M4 6h16M4 12h16M4 18h10"/><circle cx="19" cy="18" r="2"/>', 'v-lore'],
-      ['railThreads', '伏笔', '06', '<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M6 8.2V18h9.8"/>', 'v-threads']
+      ['railBook', '书稿', '03', '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v18H6.5A2.5 2.5 0 0 0 4 23z"/><path d="M8 7h7M8 11h7"/>', 'v-book'],
+      ['railLore', '设定库', '04', '<path d="M4 6h16M4 12h16M4 18h10"/><circle cx="19" cy="18" r="2"/>', 'v-lore'],
+      ['railThreads', '伏笔', '05', '<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M6 8.2V18h9.8"/>', 'v-threads']
     ];
 
     var cfg = rail.querySelector('.rail-btn[data-go="v-cfg"]');
@@ -1193,7 +1193,7 @@
     });
 
     // 协作室入口：保留但提示未上线
-    var soon = railBtn('railSoon', '协作室', '07',
+    var soon = railBtn('railSoon', '协作室', '06',
       '<path d="M21 11.5a8 8 0 0 1-8 8H7l-4 3v-11a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8Z"/>');
     soon.onclick = function () { toast('此功能暂未上线敬请期待'); };
     soon.dataset.go = '__soon';
