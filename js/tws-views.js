@@ -334,6 +334,8 @@
           '<span class="tws-words" id="twsWords">' + (c.words || 0) + ' 字</span>' +
           '<span class="tws-upd">' + D.timeAgo(c.updated) + '</span>' +
           '<span class="tws-spacer"></span>' +
+          '<button class="tws-btn sm ai" id="twsBtnPolish">润色</button>' +
+          '<button class="tws-btn sm ai" id="twsBtnIdeate">构思</button>' +
           '<button class="tws-btn sm" id="twsBtnHist">历史</button>' +
           '<button class="tws-btn sm" id="twsBtnCheck">检查</button>' +
           '<button class="tws-btn sm ghost" id="twsBtnDelCh">删除</button>' +
@@ -358,6 +360,8 @@
     });
 
     $('twsStatus').addEventListener('click', function () { cycleStatus(); });
+    $('twsBtnPolish').addEventListener('click', openPolish);
+    $('twsBtnIdeate').addEventListener('click', openIdeate);
     $('twsBtnHist').addEventListener('click', openHistory);
     $('twsBtnCheck').addEventListener('click', openCheck);
     $('twsBtnDelCh').addEventListener('click', function () {
@@ -408,6 +412,183 @@
     if (el) { el.textContent = T.exporters.statusName(st); el.className = 'tws-st st-' + st; }
     renderTree();
     toast('已标记为' + T.exporters.statusName(st));
+  }
+
+
+  /* ---------- AI 润色 ---------- */
+  function needKeyGuide() {
+    modal('还差一步',
+      '<p class="tws-p">AI 功能需要你的 API Key。它只存在这台设备的浏览器里，不会上传。</p>' +
+      '<p class="tws-p" style="margin-top:10px">到「系统配置」里填入 Key（DeepSeek 等都可以），' +
+      '之后润色、构思、检查就都能用了。</p>' +
+      '<p class="tws-p" style="margin-top:10px">不配也能用：项目、正文、设定库、伏笔、导出全部可用。</p>',
+      { okText: '去配置', onOk: function () { window.showView && window.showView('v-cfg'); } });
+  }
+
+  function openPolish() {
+    flushSave();
+    var ta = $('twsContent'), c = D.getChapter(ui.chapterId);
+    if (!ta || !c) return;
+    var ss = ta.selectionStart, se = ta.selectionEnd;
+    var hasSel = se > ss;
+    var target = hasSel ? ta.value.slice(ss, se) : ta.value;
+    if (!target.trim()) { toast('先写点内容再润色'); return; }
+    if (T.ai.needKey()) { needKeyGuide(); return; }
+
+    var styles = T.ai.POLISH_STYLES.map(function (x, i) {
+      return '<span class="chip' + (i === 0 ? ' on' : '') + '" data-ps="' + x.k + '">' + x.name + '</span>';
+    }).join('');
+
+    var m = modal('AI 润色',
+      '<div class="tws-p" style="margin-bottom:10px">' +
+        (hasSel ? '已选中 <b>' + target.length + '</b> 字' : '整章 <b>' + target.length + '</b> 字（未选中则处理全文）') +
+      '</div>' +
+      '<div class="tws-chips" id="psChips">' + styles + '</div>' +
+      '<div class="tws-ai-out" id="psOut">选择风格后点「开始润色」</div>' +
+      '<div class="tws-ai-meta" id="psMeta"></div>',
+      { footer: false });
+
+    var cur = T.ai.POLISH_STYLES[0].k;
+    var out = m.el.querySelector('#psOut');
+    var result = '';
+
+    m.el.querySelector('#psChips').addEventListener('click', function (e) {
+      var c2 = e.target.closest('[data-ps]');
+      if (!c2) return;
+      cur = c2.getAttribute('data-ps');
+      this.querySelectorAll('.chip').forEach(function (x) { x.classList.toggle('on', x === c2); });
+    });
+
+    var f = m.el.querySelector('.tws-modal-b');
+    var bar = document.createElement('div');
+    bar.className = 'tws-ai-bar';
+    bar.innerHTML = '<button class="tws-btn primary" id="psRun">开始润色</button>' +
+      '<span class="tws-spacer"></span>' +
+      '<button class="tws-btn sm" id="psReplace" disabled>' + (hasSel ? '替换选中' : '替换全文') + '</button>' +
+      '<button class="tws-btn sm" id="psAppend" disabled>追加到末尾</button>';
+    f.appendChild(bar);
+
+    bar.querySelector('#psRun').addEventListener('click', function () {
+      this.disabled = true;
+      result = '';
+      out.textContent = '';
+      out.classList.add('streaming');
+      T.ai.polish(target, cur, function (txt) {
+        out.textContent = txt;
+        out.scrollTop = out.scrollHeight;
+      }).then(function (full) {
+        result = full || out.textContent;
+        out.classList.remove('streaming');
+        var meta = m.el.querySelector('#psMeta');
+        if (meta) {
+          var longer = result.length > target.length * 1.6;
+          meta.textContent = '原文 ' + target.length + ' 字 → 润色后 ' + result.length + ' 字' +
+            (longer ? ' · 明显变长了，替换前请先看一眼' : '');
+          meta.classList.toggle('warn', longer);
+        }
+        bar.querySelector('#psReplace').disabled = false;
+        bar.querySelector('#psAppend').disabled = false;
+        bar.querySelector('#psRun').disabled = false;
+      }).catch(function (e) {
+        out.textContent = '润色失败：' + e.message;
+        out.classList.remove('streaming');
+        bar.querySelector('#psRun').disabled = false;
+      });
+    });
+
+    bar.querySelector('#psReplace').addEventListener('click', function () {
+      if (!result) return;
+      var t = $('twsContent');
+      if (!t) return;
+      D.saveChapterContent(c.id, t.value, 'AI 润色前');
+      if (hasSel) {
+        t.value = t.value.slice(0, ss) + result + t.value.slice(se);
+      } else {
+        t.value = result;
+      }
+      t.dispatchEvent(new Event('input', { bubbles: true }));
+      flushSave();
+      renderTree();
+      m.close();
+      toast('已替换（旧版本已存进历史）');
+    });
+
+    bar.querySelector('#psAppend').addEventListener('click', function () {
+      if (!result) return;
+      var t = $('twsContent');
+      if (!t) return;
+      D.saveChapterContent(c.id, t.value, 'AI 润色前');
+      t.value = (t.value ? t.value + '\n\n' : '') + result;
+      t.dispatchEvent(new Event('input', { bubbles: true }));
+      flushSave();
+      renderTree();
+      m.close();
+      toast('已追加到末尾');
+    });
+  }
+
+  /* ---------- AI 辅助构思 ---------- */
+  function openIdeate() {
+    flushSave();
+    var c = D.getChapter(ui.chapterId);
+    if (!c) { toast('先选一章'); return; }
+    if (T.ai.needKey()) { needKeyGuide(); return; }
+
+    var chips = T.ai.IDEAS.map(function (x) {
+      return '<span class="chip" data-idea="' + x.k + '">' + x.label + '</span>';
+    }).join('');
+
+    var m = modal('AI 辅助构思',
+      '<div class="tws-chips" id="idChips">' + chips + '</div>' +
+      '<input class="tws-i" id="idQ" style="margin-top:12px" placeholder="或者直接写你想问的，例如：这段怎么写得更有压迫感">' +
+      '<div class="tws-ai-out" id="idOut">选一个问题，或自己写一个</div>',
+      { footer: false });
+
+    var out = m.el.querySelector('#idOut');
+    var qInput = m.el.querySelector('#idQ');
+    var result = '';
+
+    var bar = document.createElement('div');
+    bar.className = 'tws-ai-bar';
+    bar.innerHTML = '<button class="tws-btn primary" id="idRun">开始构思</button>' +
+      '<span class="tws-spacer"></span>' +
+      '<button class="tws-btn sm" id="idCopy" disabled>复制</button>';
+    m.el.querySelector('.tws-modal-b').appendChild(bar);
+
+    m.el.querySelector('#idChips').addEventListener('click', function (e) {
+      var c2 = e.target.closest('[data-idea]');
+      if (!c2) return;
+      var it = T.ai.IDEAS.filter(function (x) { return x.k === c2.getAttribute('data-idea'); })[0];
+      qInput.value = it ? it.q : '';
+      this.querySelectorAll('.chip').forEach(function (x) { x.classList.toggle('on', x === c2); });
+    });
+
+    bar.querySelector('#idRun').addEventListener('click', function () {
+      var q = qInput.value.trim();
+      if (!q) { toast('先选一个问题或自己写一个'); return; }
+      this.disabled = true;
+      result = '';
+      out.textContent = '';
+      out.classList.add('streaming');
+      T.ai.ideate(D.D.activeProject, c, q, function (txt) {
+        out.textContent = txt;
+        out.scrollTop = out.scrollHeight;
+      }).then(function (full) {
+        result = full || out.textContent;
+        out.classList.remove('streaming');
+        bar.querySelector('#idCopy').disabled = false;
+        bar.querySelector('#idRun').disabled = false;
+      }).catch(function (e) {
+        out.textContent = '构思失败：' + e.message;
+        out.classList.remove('streaming');
+        bar.querySelector('#idRun').disabled = false;
+      });
+    });
+
+    bar.querySelector('#idCopy').addEventListener('click', function () {
+      if (!result) return;
+      try { navigator.clipboard.writeText(result); toast('已复制'); } catch (e) { toast('复制失败'); }
+    });
   }
 
   /* ---------- 版本历史 ---------- */

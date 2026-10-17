@@ -456,3 +456,38 @@
 /* ---------- 对话头部：当前章节 ---------- */
 .tws-ch-chip{ cursor: pointer; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tws-ch-chip:not(.on){ color: var(--tx-3); border-style: dashed; }
+
+/* ---------- AI 动作 ---------- */
+.tws-btn.ai{
+  border-color: color-mix(in srgb, var(--ac) 45%, transparent);
+  color: var(--ac);
+}
+.tws-btn.ai:hover{ background: var(--ac); color: var(--ac-ink); border-color: var(--ac); }
+
+.tws-ai-out{
+  margin-top: 12px; padding: 13px 14px;
+  min-height: 90px; max-height: 42vh; overflow-y: auto;
+  border: 1px solid var(--bd); background: var(--bg-1);
+  font-size: 13.5px; line-height: 1.85; color: var(--tx-2);
+  white-space: pre-wrap; word-break: break-word;
+  clip-path: var(--chamfer-2-sm);
+}
+.tws-ai-out.streaming{ border-color: color-mix(in srgb, var(--ac) 40%, transparent); }
+.tws-ai-out.streaming::after{
+  content: "▍"; color: var(--ac); margin-left: 1px;
+  animation: tws-blink .9s steps(1) infinite;
+}
+@keyframes tws-blink{ 50%{ opacity: 0; } }
+
+.tws-ai-bar{
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--bd);
+  flex-wrap: wrap;
+}
+.tws-ai-bar .tws-spacer{ flex: 1; }
+
+.tws-ai-meta{
+  margin-top: 7px; font-family: var(--mono); font-size: 10px;
+  letter-spacing: .06em; color: var(--tx-3); min-height: 14px;
+}
+.tws-ai-meta.warn{ color: var(--sig-orange, #FB923C); }

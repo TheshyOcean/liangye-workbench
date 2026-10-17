@@ -401,7 +401,79 @@
   /* ============================================================
      暴露
      ============================================================ */
+
+  /* ============================================================
+     ④ AI 润色 / 辅助构思
+     ============================================================ */
+  var POLISH_STYLES = [
+    { k: 'tight',  name: '更精炼',   prompt: '删掉冗余修饰，句子更紧，信息密度更高。' },
+    { k: 'vivid',  name: '更有画面感', prompt: '增加具体的动作与感官细节，让读者看得见。' },
+    { k: 'deai',   name: '去 AI 味',  prompt: '避免"仿佛""似乎""不禁""一丝"这类套话；句式长短错落，更像人写的。' },
+    { k: 'plain',  name: '更口语',   prompt: '让对话与叙述更贴近日常说话的语气。' },
+    { k: 'literary', name: '更文学',  prompt: '注重节奏与意象，允许留白，不要解释情绪。' }
+  ];
+
+  var IDEAS = [
+    { k: 'next',    label: '接下来写什么', q: '接下来应该发生什么？给 3 个具体可行的走向。' },
+    { k: 'tension', label: '怎么加张力',   q: '这一章太平了。指出最该加压的地方，并给出 3 个具体做法。' },
+    { k: 'turn',    label: '加个反转',     q: '给 3 个可以放进去的反转，要合理、不硬拗。' },
+    { k: 'char',    label: '人物还能怎么用', q: '本章出现的人物还有哪些没被用起来的可能？给 3 个方向。' },
+    { k: 'stuck',   label: '我卡住了',     q: '作者卡住了。先指出最可能的症结，再给 3 个能立刻往下写的开头句。' }
+  ];
+
+  /* 润色：保持原意，只改表达 */
+  function polish(text, styleKey, onText) {
+    var st = POLISH_STYLES.filter(function (x) { return x.k === styleKey; })[0] || POLISH_STYLES[0];
+    var sys = '你是中文小说编辑，只做文字层面的润色。\n' +
+      '硬性要求：\n' +
+      '1. 保持原意、叙事视角、人称、时态不变，不增删情节；\n' +
+      '2. 保留原有的分段；\n' +
+      '3. 只输出润色后的正文，不要任何解释、不要加引号、不要复述原文。\n' +
+      '风格要求：' + st.prompt;
+    return callLLM([
+      { role: 'system', content: sys },
+      { role: 'user', content: text }
+    ], onText);
+  }
+
+  /* 构思：基于正文 + 设定给方向 */
+  function ideate(projectId, chapter, question, onText) {
+    var cards = D.onCards(projectId);
+    var lore = cards.length
+      ? cards.map(function (c) {
+          var parts = [];
+          if (c.body) parts.push(c.body);
+          var a = c.attrs || {};
+          Object.keys(a).forEach(function (k) { if (a[k]) parts.push(k + '：' + a[k]); });
+          return '- ' + c.name + '：' + (parts.join('，') || '（无描述）');
+        }).join('\n')
+      : '（未勾选设定）';
+
+    var body = (chapter && chapter.content || '').slice(-3000);
+    var sys = '你是小说策划，帮作者想下一步。\n' +
+      '要求：\n' +
+      '1. 给 3 个方向，每个 2-3 句，必须具体到"能直接往下写"；\n' +
+      '2. 不要空话（如"增加冲突""深化人物"），要说清楚写什么场面、谁做什么；\n' +
+      '3. 不要替作者写正文，只给方向。';
+
+    var user = '【设定】\n' + lore + '\n\n' +
+      '【本章正文（节选末尾）】\n' + (body || '（本章还是空的）') + '\n\n' +
+      '【问题】\n' + question;
+
+    return callLLM([
+      { role: 'system', content: sys },
+      { role: 'user', content: user }
+    ], onText);
+  }
+
+  /* 无 Key 时的统一引导 */
+  function needKey() {
+    return !(window.__ENDF__ && window.__ENDF__.S && window.__ENDF__.S.apiKey);
+  }
+
   T.templates = { LIST: TEMPLATES, STYLES: STYLES, build: buildPrompt };
   T.exporters = { docx: buildDocx, download: download, statusName: statusName };
   T.checker = { run: runCheck, callLLM: callLLM };
+  T.ai = { polish: polish, ideate: ideate, needKey: needKey,
+          POLISH_STYLES: POLISH_STYLES, IDEAS: IDEAS };
 })();
