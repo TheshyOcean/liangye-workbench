@@ -1609,11 +1609,11 @@
      温度选择器（输入区右下角，GPT 式弹层）
      ============================================================ */
   var TEMP_LEVELS = [
-    { max: 0.3, name: '严谨', desc: '用词保守，紧扣设定与前文，几乎不自由发挥。适合润色、改错、定稿前收口。' },
-    { max: 0.7, name: '稳妥', desc: '在合理范围内变化，优先保证情节连贯。日常续写最安全的选择。' },
-    { max: 1.1, name: '均衡', desc: '措辞与思路都有一定新鲜感，多数场景的默认值。' },
-    { max: 1.5, name: '放飞', desc: '用词跳跃，容易冒出意外的好句子，但也更容易跑偏。' },
-    { max: 2.0, name: '狂野', desc: '高度随机，适合头脑风暴找灵感，不建议直接定稿。' }
+    { max: 0.3, name: '严谨', emoji: '\uD83D\uDE10', desc: '用词保守，紧扣设定与前文，几乎不自由发挥。适合润色、改错、定稿前收口。' },
+    { max: 0.7, name: '稳妥', emoji: '\uD83D\uDE42', desc: '在合理范围内变化，优先保证情节连贯。日常续写最安全的选择。' },
+    { max: 1.1, name: '均衡', emoji: '\uD83D\uDE0C', desc: '措辞与思路都有一定新鲜感，多数场景的默认值。' },
+    { max: 1.5, name: '放飞', emoji: '\uD83D\uDE0F', desc: '用词跳跃，容易冒出意外的好句子，但也更容易跑偏。' },
+    { max: 2.0, name: '狂野', emoji: '\uD83D\uDE0E', desc: '高度随机，适合头脑风暴找灵感，不建议直接定稿。' }
   ];
 
   function tempLevel(v) {
@@ -1698,7 +1698,8 @@
       pop = document.createElement('div');
       pop.className = 'tws-temp-pop';
       pop.innerHTML =
-        '<div class="tws-temp-h"><span class="ic">◐</span><b id="tpName">均衡</b><em id="tpVal">0.8</em></div>' +
+        '<div class="tws-temp-h"><span class="ic" id="tpIcon">' + TEMP_LEVELS[tempLevel(curTemp())].emoji + '</span>' +
+        '<b id="tpName">均衡</b><em id="tpVal">0.8</em></div>' +
         '<div class="tws-pill">' +
           '<div class="tws-pill-fill" id="tpFill">' + particles() + '</div>' +
           '<input type="range" id="tpRange" min="0" max="2" step="0.1" value="' + curTemp() + '">' +
@@ -1762,6 +1763,8 @@
         if (lv !== lastLv) {
           nameEl.textContent = TEMP_LEVELS[lv].name;
           descEl.textContent = TEMP_LEVELS[lv].desc;
+          var iconEl = pop.querySelector('#tpIcon');
+          if (iconEl) { iconEl.textContent = TEMP_LEVELS[lv].emoji; replay(iconEl, 'pop'); }
           fill.style.backgroundImage = GRAD[lv];
           pill.classList.toggle('hot', lv >= 3);
           pop.querySelectorAll('[data-lv]').forEach(function (s2, i) {

@@ -809,3 +809,18 @@
 .tws-temp-d.swap{
   animation-duration: .2s;
 }
+
+/* 温度档位表情 */
+.tws-temp-h .ic{
+  font-size: 19px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  /* emoji 自带颜色，这里的 color 只影响非 emoji 回退字形 */
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+}
+@keyframes tws-emoji-pop{
+  0%  { transform: scale(.72) rotate(-8deg); opacity: .4; }
+  55% { transform: scale(1.14) rotate(3deg); }
+  100%{ transform: scale(1) rotate(0); opacity: 1; }
+}
+.tws-temp-h .ic.pop{ animation: tws-emoji-pop .32s cubic-bezier(.34,1.5,.6,1); }
