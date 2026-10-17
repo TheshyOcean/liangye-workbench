@@ -697,3 +697,20 @@
   .tws-temp-pop, .tws-temp-h b.swap, .tws-temp-h em.swap,
   .tws-temp-ticks span.on, .tws-temp-d.swap, .tws-temp-btn.bump{ animation: none !important; }
 }
+
+/* 温度按钮：档位名 + 数值 */
+.tws-temp-btn i{
+  font-style: normal; font-size: 9.5px; opacity: .6; margin-left: 3px;
+}
+
+/* 高档位：滑块外发光 + 呼吸 */
+.tws-temp-pop input[type="range"].hot::-webkit-slider-thumb{
+  box-shadow: 0 0 0 4px rgba(224,86,138,.22), 0 0 14px rgba(240,166,60,.55);
+}
+.tws-temp-pop input[type="range"].hot{
+  animation: tws-hot 1.9s ease-in-out infinite;
+}
+@keyframes tws-hot{
+  0%,100%{ filter: none; }
+  50%    { filter: brightness(1.14); }
+}

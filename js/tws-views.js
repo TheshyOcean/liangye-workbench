@@ -1661,7 +1661,8 @@
       var t = v.toFixed(1);
       if (btn.dataset.v && btn.dataset.v !== t) replay(btn, 'bump');
       btn.dataset.v = t;
-      btn.innerHTML = '<span class="tw">T</span>' + t;
+      var nm = TEMP_LEVELS[tempLevel(v)].name;
+      btn.innerHTML = '<span class="tw">T</span>' + nm + '<i>' + t + '</i>';
     }
     paintBtn();
 
@@ -1712,8 +1713,19 @@
           s2.classList.toggle('on', i === lv);
         });
         var pct = v / 2 * 100;
+        /* 填充色随温度变化：冷 → 温 → 热 */
+        var GRAD = [
+          'linear-gradient(90deg, #4ea3b8, #6fc7a8)',   /* 严谨：冷青 */
+          'linear-gradient(90deg, #6fc7a8, #9fd456)',   /* 稳妥：青绿 */
+          'linear-gradient(90deg, #9fd456, #d9e84f)',   /* 均衡：黄绿 */
+          'linear-gradient(90deg, #d9e84f, #f0a63c)',   /* 放飞：橙 */
+          'linear-gradient(90deg, #f0a63c, #e0568a)'    /* 狂野：品红 */
+        ];
+        /* 两层：上层渐变只铺到 pct，底层是轨道底色 */
         range.style.background =
-          'linear-gradient(90deg, var(--ac-text) 0%, var(--ac-text) ' + pct + '%, var(--bd) ' + pct + '%, var(--bd) 100%)';
+          GRAD[lv] + ' 0 0 / ' + pct + '% 100% no-repeat, var(--bd)';
+        range.style.transition = 'background-size .18s linear';
+        range.classList.toggle('hot', lv >= 3);
       }
       paint();
 
