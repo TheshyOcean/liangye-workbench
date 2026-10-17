@@ -629,3 +629,71 @@
   color: var(--tx-3); transition: color .16s;
 }
 .tws-temp-f button:hover{ color: var(--ac-text); }
+
+/* ============================================================================
+   温度选择器 · 动效
+   ========================================================================== */
+/* 弹层：从按钮方向弹出（带回弹） */
+.tws-temp-pop{
+  transform-origin: 100% 100%;
+  animation: tws-pop .26s cubic-bezier(.34, 1.4, .5, 1);
+}
+@keyframes tws-pop{
+  from{ opacity: 0; transform: translateY(10px) scale(.94); }
+  to  { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 档位名切换：淡入上滑 */
+@keyframes tws-swap{
+  from{ opacity: 0; transform: translateY(-5px); }
+  to  { opacity: 1; transform: translateY(0); }
+}
+.tws-temp-h b.swap{ animation: tws-swap .24s cubic-bezier(.22,.8,.22,1); }
+
+/* 数值：等宽滚动感 */
+@keyframes tws-num{
+  0%{ transform: translateY(-3px); opacity: .4; }
+  100%{ transform: translateY(0); opacity: 1; }
+}
+.tws-temp-h em.swap{ animation: tws-num .22s ease; }
+
+/* 刻度：命中时轻弹 */
+@keyframes tws-tick{
+  0%{ transform: scale(1); }
+  42%{ transform: scale(1.16); }
+  100%{ transform: scale(1); }
+}
+.tws-temp-ticks span.on{ animation: tws-tick .3s cubic-bezier(.34,1.5,.6,1); }
+
+/* 滑块拇指：悬停变大、拖动时发光 */
+.tws-temp-pop input[type="range"]::-webkit-slider-thumb{
+  transition: transform .16s, box-shadow .16s;
+}
+.tws-temp-pop input[type="range"]:hover::-webkit-slider-thumb{ transform: scale(1.12); }
+.tws-temp-pop input[type="range"]:active::-webkit-slider-thumb{
+  transform: scale(1.22);
+  box-shadow: 0 0 0 6px var(--ac-sub);
+}
+
+/* 说明文字：切换时淡入 */
+@keyframes tws-fade{
+  from{ opacity: 0; transform: translateY(3px); }
+  to  { opacity: 1; transform: translateY(0); }
+}
+.tws-temp-d.swap{ animation: tws-fade .26s ease; }
+
+/* 按钮：按下回弹 + 数值变化时轻跳 */
+.tws-temp-btn{ transition: border-color .16s, color .16s, background .16s, transform .12s; }
+.tws-temp-btn:active{ transform: scale(.94); }
+@keyframes tws-bump{
+  0%{ transform: scale(1); }
+  38%{ transform: scale(1.09); }
+  100%{ transform: scale(1); }
+}
+.tws-temp-btn.bump{ animation: tws-bump .32s cubic-bezier(.34,1.5,.6,1); }
+
+/* 尊重系统的减少动效设置 */
+@media (prefers-reduced-motion: reduce){
+  .tws-temp-pop, .tws-temp-h b.swap, .tws-temp-h em.swap,
+  .tws-temp-ticks span.on, .tws-temp-d.swap, .tws-temp-btn.bump{ animation: none !important; }
+}

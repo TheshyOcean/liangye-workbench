@@ -1637,6 +1637,13 @@
     if (tv) tv.textContent = v.toFixed(1);
   }
 
+  function replay(el, cls) {
+    if (!el) return;
+    el.classList.remove(cls);
+    void el.offsetWidth;          /* 强制回流，让动画能重放 */
+    el.classList.add(cls);
+  }
+
   function mountTempPicker() {
     var wrap = document.querySelector('.input-wrap');
     if (!wrap || document.getElementById('twsTempBtn')) return;
@@ -1651,7 +1658,10 @@
 
     function paintBtn() {
       var v = curTemp();
-      btn.innerHTML = '<span class="tw">T</span>' + v.toFixed(1);
+      var t = v.toFixed(1);
+      if (btn.dataset.v && btn.dataset.v !== t) replay(btn, 'bump');
+      btn.dataset.v = t;
+      btn.innerHTML = '<span class="tw">T</span>' + t;
     }
     paintBtn();
 
@@ -1687,11 +1697,16 @@
       var valEl = pop.querySelector('#tpVal');
       var descEl = pop.querySelector('#tpDesc');
 
+      var lastLv = -1;
       function paint() {
         var v = Number(range.value);
         var lv = tempLevel(v);
-        nameEl.textContent = TEMP_LEVELS[lv].name;
-        valEl.textContent = v.toFixed(1);
+        var nm = TEMP_LEVELS[lv].name, vs = v.toFixed(1);
+        if (nameEl.textContent !== nm) replay(nameEl, 'swap');
+        if (valEl.textContent !== vs) replay(valEl, 'swap');
+        if (lastLv !== lv) { replay(descEl, 'swap'); lastLv = lv; }
+        nameEl.textContent = nm;
+        valEl.textContent = vs;
         descEl.textContent = TEMP_LEVELS[lv].desc;
         pop.querySelectorAll('[data-lv]').forEach(function (s2, i) {
           s2.classList.toggle('on', i === lv);
