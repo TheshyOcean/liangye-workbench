@@ -1637,6 +1637,23 @@
     if (tv) tv.textContent = v.toFixed(1);
   }
 
+  /* 胶囊里的流动粒子 */
+  function particles() {
+    var out = '';
+    for (var i = 0; i < 14; i++) {
+      var top = 18 + Math.random() * 64;          /* 18%~82% 高度 */
+      var dur = 3.4 + Math.random() * 3.2;
+      var delay = -Math.random() * 6;
+      var size = Math.random() < .28 ? 2.5 : 1.6;
+      var left = Math.random() * 100;
+      out += '<i style="top:' + top.toFixed(1) + '%;left:' + left.toFixed(1) + '%;' +
+        'animation-duration:' + dur.toFixed(2) + 's;' +
+        'animation-delay:' + delay.toFixed(2) + 's;' +
+        'width:' + size + 'px;height:' + size + 'px"></i>';
+    }
+    return out;
+  }
+
   function replay(el, cls) {
     if (!el) return;
     el.classList.remove(cls);
@@ -1677,7 +1694,10 @@
       pop.className = 'tws-temp-pop';
       pop.innerHTML =
         '<div class="tws-temp-h"><span class="ic">◐</span><b id="tpName">均衡</b><em id="tpVal">0.8</em></div>' +
-        '<input type="range" id="tpRange" min="0" max="2" step="0.1" value="' + curTemp() + '">' +
+        '<div class="tws-pill">' +
+          '<div class="tws-pill-fill" id="tpFill">' + particles() + '</div>' +
+          '<input type="range" id="tpRange" min="0" max="2" step="0.1" value="' + curTemp() + '">' +
+        '</div>' +
         '<div class="tws-temp-ticks">' +
           TEMP_LEVELS.map(function (l, i) {
             return '<span data-lv="' + i + '">' + l.name + '</span>';
@@ -1694,6 +1714,7 @@
       pop.style.bottom = (window.innerHeight - r.top + 10) + 'px';
 
       var range = pop.querySelector('#tpRange');
+      var pill = pop.querySelector('.tws-pill');
       var nameEl = pop.querySelector('#tpName');
       var valEl = pop.querySelector('#tpVal');
       var descEl = pop.querySelector('#tpDesc');
@@ -1721,11 +1742,13 @@
           'linear-gradient(90deg, #d9e84f, #f0a63c)',   /* 放飞：橙 */
           'linear-gradient(90deg, #f0a63c, #e0568a)'    /* 狂野：品红 */
         ];
-        /* 两层：上层渐变只铺到 pct，底层是轨道底色 */
-        range.style.background =
-          GRAD[lv] + ' 0 0 / ' + pct + '% 100% no-repeat, var(--bd)';
-        range.style.transition = 'background-size .18s linear';
-        range.classList.toggle('hot', lv >= 3);
+        var fill = pop.querySelector('#tpFill');
+        if (fill) {
+          fill.style.width = Math.max(6, pct) + '%';
+          fill.style.backgroundImage = GRAD[lv];
+        }
+        pill.classList.toggle('hot', lv >= 3);
+        pill.dataset.lv = String(lv);
       }
       paint();
 

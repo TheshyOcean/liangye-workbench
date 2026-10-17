@@ -714,3 +714,66 @@
   0%,100%{ filter: none; }
   50%    { filter: brightness(1.14); }
 }
+
+/* ============================================================================
+   温度滑块 · 胶囊轨道 + 流动粒子
+   ========================================================================== */
+.tws-pill{
+  position: relative; height: 30px; border-radius: 999px;
+  background: var(--bd); overflow: hidden;
+  margin: 6px 0 4px;
+  transition: box-shadow .25s;
+}
+.tws-pill.hot{ box-shadow: 0 0 16px -2px rgba(240,166,60,.45); }
+
+.tws-pill-fill{
+  position: absolute; left: 0; top: 0; bottom: 0; width: 50%;
+  border-radius: 999px; overflow: hidden;
+  background-image: linear-gradient(90deg, #9fd456, #d9e84f);
+  transition: width .18s cubic-bezier(.22,.8,.22,1), background-image .3s;
+}
+
+/* 粒子 */
+.tws-pill-fill i{
+  position: absolute; border-radius: 50%; background: #fff;
+  opacity: 0; pointer-events: none;
+  animation-name: tws-particle;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes tws-particle{
+  0%  { transform: translate(0, 0) scale(.4); opacity: 0; }
+  18% { opacity: .9; }
+  70% { opacity: .55; }
+  100%{ transform: translate(36px, -7px) scale(1.2); opacity: 0; }
+}
+
+/* range：透明轨道，只留白色圆钮 */
+.tws-pill input[type="range"]{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  margin: 0; padding: 0; border: 0; outline: none;
+  background: transparent; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+.tws-pill input[type="range"]::-webkit-slider-runnable-track{
+  height: 30px; background: transparent; border: 0;
+}
+.tws-pill input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance: none; appearance: none;
+  width: 24px; height: 24px; margin-top: 3px;
+  border-radius: 50%; background: #fff; border: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  transition: transform .16s, box-shadow .16s;
+}
+.tws-pill input[type="range"]:hover::-webkit-slider-thumb{ transform: scale(1.08); }
+.tws-pill input[type="range"]:active::-webkit-slider-thumb{
+  transform: scale(1.16); box-shadow: 0 2px 12px rgba(0,0,0,.4);
+}
+.tws-pill input[type="range"]::-moz-range-track{ height: 30px; background: transparent; }
+.tws-pill input[type="range"]::-moz-range-thumb{
+  width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .tws-pill-fill i{ animation: none !important; opacity: .5; }
+}
