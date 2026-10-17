@@ -798,12 +798,10 @@
 .tws-temp-ticks span:first-child{ text-align: left; }
 .tws-temp-ticks span:last-child{ text-align: right; }
 
-/* ③ 弹层高度与位置稳定，避免重排时的闪动 */
-.tws-temp-pop{
-  contain: layout paint;
-}
+/* ③ 弹层高度与位置稳定（contain:paint 会造成阴影/裁切闪烁，不要加） */
 .tws-pill-fill{
   will-change: width;
+  contain: paint;
 }
 
 /* ④ 名称/说明切换改用更柔的曲线，减少视觉突变 */

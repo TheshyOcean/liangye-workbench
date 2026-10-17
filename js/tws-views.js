@@ -1684,7 +1684,12 @@
     paintBtn();
 
     var pop = null;
-    function closePop() { if (pop) { pop.remove(); pop = null; } }
+    function closePop() {
+      if (!pop) return;
+      pop._detach && pop._detach();
+      pop.remove();
+      pop = null;
+    }
 
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -1707,53 +1712,70 @@
         '<div class="tws-temp-f"><button type="button" id="tpReset">恢复默认 0.8</button></div>';
       document.body.appendChild(pop);
 
-      var r = btn.getBoundingClientRect();
-      var w = Math.min(300, window.innerWidth - 24);
-      pop.style.width = w + 'px';
-      pop.style.left = Math.max(12, Math.min(r.left - w + 44, window.innerWidth - w - 12)) + 'px';
-      pop.style.bottom = (window.innerHeight - r.top + 10) + 'px';
+      function place() {
+        if (!pop) return;
+        var r = btn.getBoundingClientRect();
+        var w = Math.min(300, window.innerWidth - 24);
+        pop.style.width = w + 'px';
+        pop.style.left = Math.max(12, Math.min(r.left - w + 44, window.innerWidth - w - 12)) + 'px';
+        pop.style.bottom = (window.innerHeight - r.top + 10) + 'px';
+      }
+      place();
+      /* 页面滚动/尺寸变化时跟着按钮走，避免弹层"悬空"看起来在跳 */
+      var rafId = 0;
+      function onMove() {
+        if (rafId) return;
+        rafId = requestAnimationFrame(function () { rafId = 0; place(); });
+      }
+      window.addEventListener('scroll', onMove, true);
+      window.addEventListener('resize', onMove);
+      pop._detach = function () {
+        window.removeEventListener('scroll', onMove, true);
+        window.removeEventListener('resize', onMove);
+      };
 
       var range = pop.querySelector('#tpRange');
       var pill = pop.querySelector('.tws-pill');
+      var fill = pop.querySelector('#tpFill');
       var nameEl = pop.querySelector('#tpName');
       var valEl = pop.querySelector('#tpVal');
       var descEl = pop.querySelector('#tpDesc');
 
-      var lastLv = -1;
+      var lastLv = -1, lastVs = '';
+      /* 填充色随温度变化：冷 → 温 → 热（必须声明在 paint 顶部，下面会先用） */
+      var GRAD = [
+        'linear-gradient(90deg, #4ea3b8, #6fc7a8)',   /* 严谨：冷青 */
+        'linear-gradient(90deg, #6fc7a8, #9fd456)',   /* 稳妥：青绿 */
+        'linear-gradient(90deg, #9fd456, #d9e84f)',   /* 均衡：黄绿 */
+        'linear-gradient(90deg, #d9e84f, #f0a63c)',   /* 放飞：橙 */
+        'linear-gradient(90deg, #f0a63c, #e0568a)'    /* 狂野：品红 */
+      ];
       function paint() {
         var v = Number(range.value);
         var lv = tempLevel(v);
-        var nm = TEMP_LEVELS[lv].name, vs = v.toFixed(1);
-        /* 只有「档位」变化时才重放动画；数值每 0.1 都变，重放会一直闪 */
-        if (lastLv !== lv) {
+        var vs = v.toFixed(1);
+
+        /* 数值：变了才写 */
+        if (vs !== lastVs) { valEl.textContent = vs; lastVs = vs; }
+
+        /* 档位相关：变了才写 + 才重放动画（快速拖动时能少掉大量重排/重绘） */
+        if (lv !== lastLv) {
+          nameEl.textContent = TEMP_LEVELS[lv].name;
+          descEl.textContent = TEMP_LEVELS[lv].desc;
+          fill.style.backgroundImage = GRAD[lv];
+          pill.classList.toggle('hot', lv >= 3);
+          pop.querySelectorAll('[data-lv]').forEach(function (s2, i) {
+            s2.classList.toggle('on', i === lv);
+          });
           if (lastLv !== -1) {
             replay(nameEl, 'swap');
             replay(descEl, 'swap');
           }
           lastLv = lv;
         }
-        nameEl.textContent = nm;
-        valEl.textContent = vs;
-        descEl.textContent = TEMP_LEVELS[lv].desc;
-        pop.querySelectorAll('[data-lv]').forEach(function (s2, i) {
-          s2.classList.toggle('on', i === lv);
-        });
         var pct = v / 2 * 100;
-        /* 填充色随温度变化：冷 → 温 → 热 */
-        var GRAD = [
-          'linear-gradient(90deg, #4ea3b8, #6fc7a8)',   /* 严谨：冷青 */
-          'linear-gradient(90deg, #6fc7a8, #9fd456)',   /* 稳妥：青绿 */
-          'linear-gradient(90deg, #9fd456, #d9e84f)',   /* 均衡：黄绿 */
-          'linear-gradient(90deg, #d9e84f, #f0a63c)',   /* 放飞：橙 */
-          'linear-gradient(90deg, #f0a63c, #e0568a)'    /* 狂野：品红 */
-        ];
-        var fill = pop.querySelector('#tpFill');
-        if (fill) {
-          fill.style.width = Math.max(6, pct) + '%';
-          fill.style.backgroundImage = GRAD[lv];
-        }
-        pill.classList.toggle('hot', lv >= 3);
-        pill.dataset.lv = String(lv);
+        /* 填充宽度每帧都要变，这是唯一的高频写 */
+        fill.style.width = Math.max(6, pct) + '%';
       }
       paint();
 
@@ -1769,7 +1791,6 @@
     });
 
     document.addEventListener('click', closePop);
-    window.addEventListener('resize', closePop);
     window.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePop(); });
 
     /* 配置页改动时同步 */
