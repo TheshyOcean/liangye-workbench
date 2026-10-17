@@ -30,6 +30,10 @@
     swap:'<path d="M3.5 8.5h14l-3.5-3.5"/><path d="M20.5 15.5h-14l3.5 3.5"/>',
     sync:'<path d="M12 3.5v9M12 3.5 8.5 7M12 3.5 15.5 7"/><path d="M12 20.5v-9M12 20.5 8.5 17M12 20.5l3.5-3.5"/>',
     info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.6v.1"/>',
+    chat:'<path d="M21 11.5a8 8 0 0 1-8 8H7l-4 3v-11a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8Z"/><path d="M8.5 11h7M8.5 14h4"/>',
+    book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v18H6.5A2.5 2.5 0 0 0 4 23z"/><path d="M8 7h7M8 11h7"/>',
+    lore:'<rect x="3.5" y="4.5" width="17" height="15"/><path d="M7.5 9h9M7.5 13h6"/>',
+    thread:'<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M6 8.2V18h9.8"/>',
     orbit:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v3M12 18.4v3M2.6 12h3M18.4 12h3"/><circle cx="19.6" cy="6.4" r="1.6"/>',
     close:'<path d="m6 6 12 12M18 6 6 18"/>'
   };
@@ -41,7 +45,7 @@
   if(rail&&!mobile){
     var navButtons=rail.querySelectorAll('.rail-btn');
     navButtons[0].innerHTML=svg('pen')+'<span>创作对话</span><small>01</small>';
-    navButtons[1].innerHTML=svg('settings')+'<span>系统配置</span><small>04</small>';
+    navButtons[1].innerHTML=svg('settings')+'<span>系统配置</span><small>08</small>';
     var history=button('studioHistory','对话档案','history','rail-btn studio-nav');
     history.innerHTML=svg('history')+'<span>对话档案</span><small>02</small>';
     history.onclick=function(){click('btnDrawer');};
@@ -67,7 +71,7 @@
   focus.onclick=toggleFocus;var fn=document.getElementById('studioFocusNav');if(fn)fn.onclick=toggleFocus;
   var theme=document.getElementById('btnTheme');
   if(mobile&&theme){theme.classList.add('studio-mobile-theme');top.insertBefore(theme,focus);}
-  var version=document.createElement('span');version.className='studio-version';version.textContent='beta2.0.04';version.style.cssText='font:9px var(--mono);color:var(--tx-3);margin-left:4px;white-space:nowrap';if(mobile){version.style.fontSize='8px';document.querySelector('#v-chat .sec-head').appendChild(version);}else{document.querySelector('.brand').appendChild(version);}
+  var version=document.createElement('span');version.className='studio-version';version.textContent='beta2.0.10';version.style.cssText='font:9px var(--mono);color:var(--tx-3);margin-left:4px;white-space:nowrap';if(mobile){version.style.fontSize='8px';document.querySelector('#v-chat .sec-head').appendChild(version);}else{document.querySelector('.brand').appendChild(version);}
   var title=document.querySelector('#v-chat .sec-en');if(title)title.textContent='CREATIVE OPERATIONS / WRITING CONSOLE';
   var composer=document.querySelector('.composer');
   var meta=document.createElement('div');meta.className='studio-input-meta';meta.innerHTML='<span id="studioChars">0 字</span><span>'+(mobile?'写下灵感，或长按正文选择批注':'<kbd>ENTER</kbd> 发送 <i>/</i> <kbd>SHIFT + ENTER</kbd> 换行')+'</span>';

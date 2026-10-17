@@ -1,0 +1,458 @@
+/* ============================================================================
+   TWS · 新视图样式
+   全部复用工作台现有设计令牌（--bg-* / --tx-* / --ac / --bd / --chamfer）
+   ========================================================================== */
+
+/* ---------- 通用控件 ---------- */
+.tws-btn{
+  padding: 9px 16px; border: 1px solid var(--bd-s); background: transparent;
+  color: var(--tx-1); font: inherit; font-size: 13px; cursor: pointer;
+  clip-path: var(--chamfer-2-sm); transition: border-color .16s, background .16s, color .16s;
+}
+.tws-btn:hover{ border-color: var(--ac); }
+.tws-btn.primary{ background: var(--ac); border-color: var(--ac); color: var(--ac-ink); font-weight: 600; }
+.tws-btn.primary:hover{ filter: brightness(1.06); }
+.tws-btn.ghost{ color: var(--tx-3); }
+.tws-btn.ghost:hover{ color: var(--sig-red, #FA294B); border-color: var(--sig-red, #FA294B); }
+.tws-btn.sm{ padding: 6px 11px; font-size: 12px; }
+
+.tws-l{
+  display: block; margin: 14px 0 6px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--tx-3);
+}
+.tws-i{
+  width: 100%; padding: 10px 12px; border: 1px solid var(--bd-s);
+  background: var(--bg-1); color: var(--tx-1); font: inherit; font-size: 14px;
+  outline: none; clip-path: var(--chamfer-2-sm);
+}
+.tws-i:focus{ border-color: var(--ac); }
+.tws-ta{ min-height: 90px; resize: vertical; line-height: 1.7; }
+.tws-p{ font-size: 12.5px; line-height: 1.75; color: var(--tx-2); }
+.tws-chk{
+  display: flex; align-items: center; gap: 8px; margin-top: 12px;
+  font-size: 13px; color: var(--tx-2); cursor: pointer;
+}
+.tws-chk input{ accent-color: var(--ac); }
+.tws-chips{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+
+/* ---------- toast ---------- */
+.tws-toast{
+  position: fixed; left: 50%; bottom: 92px; transform: translate(-50%, 14px);
+  z-index: 9000; padding: 11px 20px;
+  background: var(--bg-4); border: 1px solid var(--bd-s); color: var(--tx-1);
+  font-size: 13px; letter-spacing: .02em; white-space: nowrap;
+  clip-path: var(--chamfer-2-sm);
+  opacity: 0; transition: opacity .24s, transform .24s;
+  pointer-events: none;
+}
+.tws-toast.on{ opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- modal ---------- */
+.tws-modal-wrap{
+  position: fixed; inset: 0; z-index: 8000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; background: rgba(0,0,0,.5);
+  opacity: 0; transition: opacity .22s;
+  backdrop-filter: blur(2px);
+}
+.tws-modal-wrap.on{ opacity: 1; }
+.tws-modal{
+  width: 100%; max-width: 480px; max-height: 86vh;
+  display: flex; flex-direction: column;
+  background: var(--bg-3); border: 1px solid var(--bd-s);
+  border-top: 2px solid var(--ac);
+  clip-path: var(--chamfer-2);
+  transform: translateY(10px); transition: transform .24s var(--studio-ease, cubic-bezier(.22,.8,.22,1));
+}
+.tws-modal-wrap.on .tws-modal{ transform: translateY(0); }
+.tws-modal-h{
+  display: flex; align-items: center; gap: 9px;
+  padding: 16px 18px; border-bottom: 1px solid var(--bd); flex: none;
+}
+.tws-modal-h .sq{ width: 4px; height: 15px; background: var(--ac); }
+.tws-modal-h b{ font-size: 14px; font-weight: 600; flex: 1; }
+.tws-x{
+  border: 0; background: none; color: var(--tx-3); font-size: 15px;
+  cursor: pointer; padding: 2px 4px; line-height: 1;
+}
+.tws-x:hover{ color: var(--tx-1); }
+.tws-modal-b{ padding: 6px 18px 18px; overflow-y: auto; }
+.tws-modal-f{
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding: 14px 18px; border-top: 1px solid var(--bd); flex: none;
+}
+
+/* ---------- 书稿 ---------- */
+.tws-book{ flex: 1; min-height: 0; display: flex; overflow: hidden; }
+
+.tws-tree{
+  width: 272px; flex: none; overflow-y: auto;
+  border-right: 1px solid var(--bd); padding: 14px 0;
+}
+.tws-tree::-webkit-scrollbar{ width: 6px; }
+.tws-tree::-webkit-scrollbar-thumb{ background: var(--bd-s); }
+
+.tws-proj-h{ padding: 0 14px 12px; border-bottom: 1px solid var(--bd); position: relative; }
+.tws-proj-n{ font-size: 14px; font-weight: 600; color: var(--tx-1); }
+.tws-proj-s{
+  font-family: var(--mono); font-size: 10px; letter-spacing: .08em;
+  color: var(--tx-3); margin-top: 4px;
+}
+.tws-proj-a{ position: absolute; right: 10px; top: 0; display: flex; gap: 2px; }
+.tws-proj-a button{
+  border: 0; background: none; color: var(--tx-3); cursor: pointer;
+  font-size: 12px; padding: 4px 6px;
+}
+.tws-proj-a button:hover{ color: var(--ac); }
+
+.tws-vol-h{
+  display: flex; align-items: center; gap: 6px;
+  padding: 11px 12px 7px; cursor: pointer;
+}
+.tws-caret{ font-size: 9px; color: var(--tx-3); width: 10px; }
+.tws-vol-n{ font-size: 12.5px; font-weight: 600; color: var(--tx-2); flex: 1; }
+.tws-vol-s{ font-family: var(--mono); font-size: 9.5px; color: var(--tx-3); }
+.tws-vol-h button{
+  border: 0; background: none; color: var(--tx-3); cursor: pointer;
+  font-size: 12px; padding: 0 3px; opacity: 0;
+}
+.tws-vol-h:hover button{ opacity: 1; }
+.tws-vol-h button:hover{ color: var(--ac); }
+
+.tws-ch{
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px 8px 28px; cursor: pointer;
+  border-left: 2px solid transparent;
+}
+.tws-ch:hover{ background: var(--bg-4); }
+.tws-ch.on{
+  background: var(--ac-sub); border-left-color: var(--ac);
+}
+.tws-ch-n{
+  flex: 1; font-size: 13px; color: var(--tx-2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tws-ch.on .tws-ch-n{ color: var(--tx-1); font-weight: 500; }
+.tws-ch-w{ font-family: var(--mono); font-size: 9.5px; color: var(--tx-3); }
+.tws-ch-empty{
+  padding: 6px 12px 10px 28px; font-size: 11.5px; color: var(--tx-3);
+}
+
+.tws-st{
+  font-family: var(--mono); font-size: 9px; letter-spacing: .06em;
+  padding: 2px 6px; border: 1px solid; flex: none;
+}
+.tws-st.st-draft{ color: var(--tx-3); border-color: var(--bd-s); }
+.tws-st.st-revising{ color: var(--sig-orange, #FB923C); border-color: color-mix(in srgb, var(--sig-orange, #FB923C) 45%, transparent); }
+.tws-st.st-final{ color: var(--ac); border-color: color-mix(in srgb, var(--ac) 50%, transparent); }
+
+/* ---------- 编辑器 ---------- */
+.tws-editor{ flex: 1; min-width: 0; display: flex; flex-direction: column; overflow-y: auto; }
+.tws-ch-head{ padding: 22px 30px 0; flex: none; }
+.tws-ch-title{
+  width: 100%; border: 0; background: none; color: var(--tx-1);
+  font-family: var(--disp, var(--sans)); font-size: 23px; font-weight: 700;
+  outline: none; padding: 0 0 8px;
+}
+.tws-ch-row{
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding-bottom: 14px; border-bottom: 1px solid var(--bd);
+}
+.tws-ch-row .tws-st{ cursor: pointer; }
+.tws-words{ font-family: var(--mono); font-size: 10.5px; color: var(--tx-3); letter-spacing: .06em; }
+.tws-upd{ font-family: var(--mono); font-size: 10px; color: var(--tx-3); }
+.tws-spacer{ flex: 1; }
+
+.tws-content{
+  flex: 1; width: 100%; min-height: 320px; padding: 24px 30px 80px;
+  border: 0; background: none; color: var(--tx-1); outline: none; resize: none;
+  font-family: var(--sans); font-size: var(--story-size, 17px); line-height: 2;
+  letter-spacing: .01em;
+}
+.tws-content::placeholder{ color: var(--tx-3); }
+
+.tws-empty{
+  margin: auto; padding: 40px 24px; text-align: center; color: var(--tx-3);
+  font-size: 13px; line-height: 1.9;
+}
+.tws-empty b{ display: block; font-size: 15px; color: var(--tx-2); margin-bottom: 6px; }
+.tws-empty.small{ padding: 30px 20px; }
+.tws-empty .tws-btn{ margin-top: 14px; }
+
+/* ---------- Tab 与卡片 ---------- */
+.tws-tabs{
+  display: flex; gap: 8px; padding: 12px 26px; flex: none;
+  border-bottom: 1px solid var(--bd);
+}
+.tws-cards{
+  flex: 1; overflow-y: auto; padding: 18px 26px 40px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px; align-content: start;
+}
+.tws-card{
+  padding: 14px 15px; border: 1px solid var(--bd); background: var(--bg-3);
+  clip-path: var(--chamfer-2-sm); cursor: pointer;
+  transition: border-color .16s, background .16s;
+}
+.tws-card:hover{ border-color: var(--ac); background: var(--bg-4); }
+.tws-card-h{ display: flex; align-items: center; gap: 8px; }
+.tws-card-h b{ font-size: 14.5px; font-weight: 600; color: var(--tx-1); }
+.tws-pin{
+  font-family: var(--mono); font-size: 8.5px; letter-spacing: .08em;
+  padding: 1px 5px; color: var(--ac);
+  border: 1px solid color-mix(in srgb, var(--ac) 45%, transparent);
+}
+.tws-card-al{
+  font-family: var(--mono); font-size: 10px; color: var(--tx-3);
+  margin-top: 3px; letter-spacing: .04em;
+}
+.tws-card-b{
+  margin-top: 9px; font-size: 12.5px; line-height: 1.7; color: var(--tx-2);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- 伏笔 / 时间线 ---------- */
+.tws-thread-list{ flex: 1; overflow-y: auto; padding: 16px 26px 40px; }
+.tws-thread{
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-bottom: 1px solid var(--bd); cursor: pointer;
+}
+.tws-thread:hover{ background: var(--bg-4); }
+.tws-dot{
+  width: 8px; height: 8px; flex: none; border-radius: 50%;
+  background: var(--sig-orange, #FB923C);
+}
+.tws-dot.done{ background: var(--sig-green, #7ADDB5); }
+.tws-dot.dropped{ background: var(--bd-s); }
+.tws-thread-m{ flex: 1; min-width: 0; }
+.tws-thread-m b{ display: block; font-size: 13.5px; color: var(--tx-1); font-weight: 500; }
+.tws-thread-n{
+  display: block; font-size: 11.5px; color: var(--tx-3); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tws-thread-c{
+  font-family: var(--mono); font-size: 10px; color: var(--tx-3);
+  letter-spacing: .04em; flex: none;
+}
+.tws-tag{
+  font-family: var(--mono); font-size: 9px; letter-spacing: .06em;
+  padding: 2px 6px; border: 1px solid; flex: none;
+}
+.tws-tag.open{ color: var(--sig-orange, #FB923C); border-color: color-mix(in srgb, var(--sig-orange, #FB923C) 45%, transparent); }
+.tws-tag.done{ color: var(--sig-green, #7ADDB5); border-color: color-mix(in srgb, var(--sig-green, #7ADDB5) 45%, transparent); }
+.tws-tag.dropped{ color: var(--tx-3); border-color: var(--bd-s); }
+
+.tws-tl-g{ margin-bottom: 18px; }
+.tws-tl-gh{
+  font-family: var(--mono); font-size: 10px; letter-spacing: .16em;
+  color: var(--tx-3); text-transform: uppercase;
+  padding-bottom: 7px; margin-bottom: 6px; border-bottom: 1px solid var(--bd);
+}
+.tws-tl{ display: flex; gap: 14px; padding: 7px 0 7px 10px; position: relative; }
+.tws-tl::before{
+  content: ""; position: absolute; left: 0; top: 13px;
+  width: 4px; height: 4px; background: var(--ac);
+}
+.tws-tl-w{
+  font-family: var(--mono); font-size: 10.5px; color: var(--ac);
+  width: 84px; flex: none; letter-spacing: .04em;
+}
+.tws-tl-t{ flex: 1; font-size: 13px; color: var(--tx-2); line-height: 1.6; }
+.tws-tl-h{ font-family: var(--mono); font-size: 10px; color: var(--tx-3); flex: none; }
+
+/* ---------- 版本 / 对比 ---------- */
+.tws-vers{ display: flex; flex-direction: column; gap: 2px; }
+.tws-ver{
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 10px 12px; border-left: 2px solid transparent; cursor: pointer;
+}
+.tws-ver:hover{ background: var(--bg-4); }
+.tws-ver.on{ border-left-color: var(--ac); background: var(--ac-sub); }
+.tws-ver-t{ font-size: 13px; color: var(--tx-1); flex: 1; }
+.tws-ver-m{ font-family: var(--mono); font-size: 10px; color: var(--tx-3); }
+
+.tws-diff{ max-height: 50vh; overflow: auto; }
+.tws-diff table{ width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.tws-diff th{
+  position: sticky; top: 0; background: var(--bg-3);
+  font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+  color: var(--tx-3); text-align: left; padding: 8px 10px;
+  border-bottom: 1px solid var(--bd);
+}
+.tws-diff td{
+  padding: 7px 10px; vertical-align: top; color: var(--tx-2);
+  border-bottom: 1px solid var(--bd); line-height: 1.7;
+  width: 50%;
+}
+.tws-diff tr.chg td{ background: color-mix(in srgb, var(--ac) 7%, transparent); }
+.tws-diff tr.chg td:last-child{ color: var(--tx-1); }
+
+/* ---------- 检查 ---------- */
+.tws-checking{ padding: 30px 0; text-align: center; }
+.tws-spin{
+  width: 26px; height: 26px; margin: 0 auto 14px;
+  border: 2px solid var(--bd-s); border-top-color: var(--ac);
+  border-radius: 50%; animation: tws-spin .8s linear infinite;
+}
+@keyframes tws-spin{ to{ transform: rotate(360deg); } }
+.tws-ok-big{
+  padding: 26px 0; text-align: center;
+  font-size: 15px; color: var(--sig-green, #7ADDB5);
+}
+.tws-issue-h{
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
+  color: var(--sig-orange, #FB923C); padding: 12px 0 8px;
+}
+.tws-issue{
+  padding: 11px 13px; margin-bottom: 8px;
+  border-left: 2px solid var(--sig-orange, #FB923C); background: var(--bg-4);
+}
+.tws-issue-t{ font-size: 13px; font-weight: 600; color: var(--tx-1); }
+.tws-issue-q{
+  margin-top: 5px; font-size: 12px; color: var(--tx-2);
+  font-family: var(--mono);
+}
+.tws-issue-r{ margin-top: 4px; font-size: 12px; color: var(--tx-3); line-height: 1.65; }
+
+/* ---------- 统计 ---------- */
+.tws-goal-chip{ cursor: pointer; }
+.tws-stat-row{ display: flex; gap: 10px; margin: 8px 0 18px; }
+.tws-stat{
+  flex: 1; padding: 14px 10px; text-align: center;
+  border: 1px solid var(--bd); background: var(--bg-4);
+  clip-path: var(--chamfer-2-sm);
+}
+.tws-stat b{ display: block; font-family: var(--num, var(--mono)); font-size: 21px; color: var(--tx-1); }
+.tws-stat span{ font-size: 10.5px; color: var(--tx-3); }
+
+.tws-bars{
+  display: flex; align-items: flex-end; gap: 8px; height: 96px;
+  padding: 8px 4px 0; border-bottom: 1px solid var(--bd);
+}
+.tws-bar{
+  flex: 1; height: 100%; display: flex; flex-direction: column;
+  justify-content: flex-end; align-items: center; position: relative;
+}
+.tws-bar i{
+  width: 100%; max-width: 26px; background: var(--ac); min-height: 2px;
+  transition: height .4s var(--studio-ease, cubic-bezier(.22,.8,.22,1));
+}
+.tws-bar span{
+  position: absolute; bottom: -19px; font-size: 9.5px; color: var(--tx-3);
+}
+.tws-bar em{
+  position: absolute; top: -15px; font-style: normal;
+  font-family: var(--mono); font-size: 8.5px; color: var(--tx-3);
+}
+.tws-bars + .tws-l{ margin-top: 30px; }
+
+/* ---------- 模板 ---------- */
+.tws-tpls{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 8px; }
+.tws-tpl{
+  padding: 14px 12px; border: 1px solid var(--bd-s); cursor: pointer;
+  clip-path: var(--chamfer-2-sm); transition: all .16s;
+}
+.tws-tpl:hover{ border-color: var(--ac); background: var(--ac-sub); }
+.tws-tpl b{ display: block; font-size: 14px; color: var(--tx-1); }
+.tws-tpl span{ display: block; font-size: 11px; color: var(--tx-3); margin-top: 3px; }
+
+.tws-tpl-btn{
+  padding: 4px 10px; border: 1px solid var(--bd-s); background: transparent;
+  color: var(--tx-3); font-family: var(--mono); font-size: 10px;
+  letter-spacing: .1em; cursor: pointer; flex: none;
+  transition: color .16s, border-color .16s;
+}
+.tws-tpl-btn:hover{ color: var(--ac); border-color: var(--ac); }
+
+/* ---------- 采纳按钮 ---------- */
+.tws-adopt{
+  border: 1px solid color-mix(in srgb, var(--ac) 55%, transparent) !important;
+  color: var(--ac) !important;
+}
+.tws-adopt:hover{ background: var(--ac) !important; color: var(--ac-ink) !important; }
+
+/* ---------- 窄屏 ---------- */
+@media (max-width: 900px) {
+  .tws-book{ flex-direction: column; }
+  .tws-tree{
+    width: 100%; max-height: 42vh; border-right: 0;
+    border-bottom: 1px solid var(--bd);
+  }
+  .tws-ch-head{ padding: 16px 16px 0; }
+  .tws-ch-title{ font-size: 19px; }
+  .tws-content{ padding: 16px 16px 60px; }
+  .tws-tabs{ padding: 10px 15px; }
+  .tws-cards{ padding: 14px 15px 30px; grid-template-columns: 1fr 1fr; }
+  .tws-thread-list{ padding: 12px 15px 30px; }
+  .tws-thread{ flex-wrap: wrap; gap: 8px; }
+  .tws-thread-c{ width: 100%; padding-left: 20px; }
+  .tws-tpls{ grid-template-columns: 1fr; }
+  .tws-modal{ max-width: 100%; }
+  .tws-stat b{ font-size: 18px; }
+}
+@media (max-width: 520px) {
+  .tws-cards{ grid-template-columns: 1fr; }
+  .tws-ch-w{ display: none; }
+}
+
+/* ---------- 窄屏区段头：三个新视图的头部会挤，单独收紧 ---------- */
+@media (max-width: 900px) {
+  #v-book .sec-head,
+  #v-lore .sec-head,
+  #v-threads .sec-head {
+    flex-wrap: wrap; gap: 6px 10px;
+    padding: 13px 15px 10px; align-items: center;
+  }
+  #v-book .sec-no, #v-lore .sec-no, #v-threads .sec-no {
+    font-size: 21px; line-height: 1;
+  }
+  #v-book .sec-en, #v-lore .sec-en, #v-threads .sec-en { display: none; }
+  #v-book .sec-meta, #v-lore .sec-meta, #v-threads .sec-meta { gap: 0; }
+  #v-book .sec-cn, #v-lore .sec-cn, #v-threads .sec-cn { font-size: 15px; }
+  #v-book .sec-right, #v-lore .sec-right, #v-threads .sec-right {
+    width: 100%; justify-content: flex-start; gap: 6px; flex-wrap: wrap;
+  }
+  #v-book .sec-right .mini-btn, #v-lore .sec-right .mini-btn, #v-threads .sec-right .mini-btn {
+    padding: 5px 9px; font-size: 11px;
+  }
+  .tws-goal-chip { font-size: 10px !important; padding: 4px 8px !important; }
+  .tws-ch-row { gap: 7px; }
+  .tws-ch-row .tws-btn.sm { padding: 5px 9px; font-size: 11px; }
+}
+
+/* ---------- 设定库：带上开关 ---------- */
+.tws-card.on{ border-color: color-mix(in srgb, var(--ac) 55%, transparent); background: var(--ac-sub); }
+.tws-sw{
+  margin-left: auto; flex: none; width: 30px; height: 17px; position: relative;
+  border: 1px solid var(--bd-s); background: var(--bg-1); cursor: pointer;
+  transition: background .18s, border-color .18s;
+}
+.tws-sw::after{
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 11px; height: 11px; background: var(--tx-3);
+  transition: transform .18s var(--studio-ease, cubic-bezier(.22,.8,.22,1)), background .18s;
+}
+.tws-sw.on{ background: color-mix(in srgb, var(--ac) 22%, transparent); border-color: var(--ac); }
+.tws-sw.on::after{ transform: translateX(13px); background: var(--ac); }
+
+.tws-lore-hint{
+  flex: none; padding: 9px 26px 0; font-size: 11.5px; line-height: 1.6;
+  color: var(--tx-3);
+}
+.tws-lore-hint b{ color: var(--ac); font-weight: 600; }
+.tws-lore-hint.has{ color: var(--tx-2); }
+
+/* ---------- 对话历史快照 ---------- */
+.tws-snap{
+  display: flex; align-items: baseline; gap: 10px; padding: 10px 12px;
+  border-left: 2px solid var(--bd-s); cursor: pointer;
+}
+.tws-snap:hover{ background: var(--bg-4); border-left-color: var(--ac); }
+.tws-snap-t{ flex: 1; font-size: 13px; color: var(--tx-1); }
+.tws-snap-m{ font-family: var(--mono); font-size: 10px; color: var(--tx-3); }
+
+/* ---------- 对话头部：当前章节 ---------- */
+.tws-ch-chip{ cursor: pointer; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tws-ch-chip:not(.on){ color: var(--tx-3); border-style: dashed; }

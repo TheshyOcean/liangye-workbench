@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
 <meta name="color-scheme" content="dark light">
+
+
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -1853,6 +1855,7 @@ html.kb-open .chat{padding-bottom:2px;}
 }
 </style>
 <link rel="stylesheet" href="terminal-redesign.css">
+<link rel="stylesheet" href="js/tws.css">
 </head>
 <body class="is-loading">
 
@@ -1880,7 +1883,7 @@ html.kb-open .chat{padding-bottom:2px;}
         <div class="ld-status">
           <span>STATUS <b id="ldState">INITIALIZING</b></span>
           <span>MODULE <b>04 / 04</b></span>
-          <span>BUILD <b>beta2.0.04</b></span>
+          <span>BUILD <b>beta2.0.10</b></span>
         </div>
       </div>
       <div class="ld-track"><i id="ldFill"></i></div>
@@ -2117,7 +2120,7 @@ html.kb-open .chat{padding-bottom:2px;}
     <span class="sb hide-sm">MODEL <b id="sbModel">deepseek-chat</b></span>
     <span class="sp"></span>
     <span class="hz"></span>
-    <span class="sb hide-sm">BUILD <b>beta2.0.04</b></span>
+    <span class="sb hide-sm">BUILD <b>beta2.0.10</b></span>
     <span class="sb">© To写作工作台</span>
   </footer>
 </div>
@@ -2365,6 +2368,7 @@ function showView(id){
   $$('.view').forEach(function(v){ v.classList.toggle('active',v.id===id); });
   $$('.rail-btn').forEach(function(b){ b.classList.toggle('active',b.dataset.go===id); });
 }
+window.showView=showView;   /* 导出给协作室等外部模块切换视图 */
 
 /* ============================================================
    会话（单一对话 + 历史记录）
@@ -2749,6 +2753,11 @@ function buildMessages(conv){
   if(onSkills.length){
     sys+='\n\n当前启用技能：\n'+onSkills.map(function(s){return '· '+s.name+'：'+s.prompt;}).join('\n');
   }
+  /* 设定库：勾选了"带上"的卡片自动拼进提示词 */
+  try{
+    var _lore=(window.TWS&&window.TWS.lorePrompt)?window.TWS.lorePrompt():'';
+    if(_lore) sys+='\n\n'+_lore;
+  }catch(e){}
   if(sys.trim()) msgs.push({role:'system',content:sys});
   conv.msgs.forEach(function(m){
     if(m.stream) return;
@@ -3864,6 +3873,7 @@ function fillInput(text){
 function regenFrom(i){
   var c=curConv(); if(!c) return;
   if(S.gen){ toast('正在生成中，先停止再试'); return; }
+  try{ window.TWS&&window.TWS.snapConv&&window.TWS.snapConv('重生成前'); }catch(e){}
   c.msgs=c.msgs.slice(0,i);
   save(); renderChat(); renderDrawer();
   if(!c.msgs.length){ toast('已清空，没有可重新生成的内容'); return; }
@@ -3878,6 +3888,7 @@ function quoteModify(i,selText){
 }
 function editFrom(i){
   var c=curConv(); if(!c||!c.msgs[i]) return;
+  try{ window.TWS&&window.TWS.snapConv&&window.TWS.snapConv('编辑取回前'); }catch(e){}
   var old=c.msgs[i].c;
   c.msgs=c.msgs.slice(0,i);          /* 取回问题 → 之后重新生成 */
   save(); renderChat(); renderDrawer();
@@ -4222,5 +4233,8 @@ window.__ENDF__={S:S,save:save,renderDrawer:renderDrawer,renderChat:renderChat,g
 })();
 </script>
 <script src="terminal-redesign.js"></script>
+<script src="js/tws-data.js"></script>
+<script src="js/tws-features.js"></script>
+<script src="js/tws-views.js"></script>
 </body>
 </html>

@@ -55,6 +55,7 @@ p.sub{font-size:13px;line-height:1.7;color:var(--tx2);}
 .choose button::before{content:"";width:4px;height:18px;background:var(--ac);flex:none;}
 .hint{margin-top:10px;font-size:11.5px;line-height:1.7;color:var(--tx3);}
 .hint code{font-family:var(--mono);color:var(--tx2);}
+
 /* Launch screen shares the workstation's archival visual language. */
 @font-face{font-family:"Space Grotesk";src:url("fonts/font-003.woff2") format("woff2");font-weight:700;font-display:swap}
 :root{--bg:#171918;--bg2:#1e211f;--tx:#eff0e7;--tx2:#a8ada6;--tx3:#80877f;--ac:#e5f24a;--bd:#373d36;--bds:#596152}
@@ -75,7 +76,8 @@ h1{font-size:25px;margin:15px 0 10px}.eyebrow{color:var(--tx2)}
 <body>
 <div class="wrap">
   <div class="brand"><i class="mark"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M0 0h25.5L32 6.5V32H6.5L0 25.5Z" fill="#101110"/><path d="M2.6 2.6h21.7l5.1 5.1v21.7H7.7L2.6 24.3Z" stroke="#fff500" stroke-opacity=".32"/><rect x="5.1" y="8.2" width="15.2" height="3.8" fill="#fff500"/><rect x="10.8" y="8.2" width="3.8" height="14" fill="#fff500"/><circle cx="22.3" cy="19.2" r="3.4" stroke="#00E5FF" stroke-width="2.4"/></svg></i><b>To Writing Studio</b><span>To写作工作台</span></div>
-  <div class="card">
+
+  <div class="card" id="boot">
     <div class="eyebrow" id="eyebrow">Detecting device</div>
     <h1 id="title">正在识别设备…</h1>
     <p class="sub" id="sub">即将进入最适合当前设备的界面</p>
@@ -91,15 +93,16 @@ h1{font-size:25px;margin:15px 0 10px}.eyebrow{color:var(--tx2)}
 <script>
 (function(){
   'use strict';
-  /* ↓↓↓ 如果两套界面改了文件名，只改这两行 ↓↓↓ */
-  var V={ desktop:'desktop.html', mobile:'mobile.html' };
-  /* ↑↑↑ 用单文件版就改成 'index1.html' / 'index2.html' ↑↑↑ */
+  var $ = function(s){ return document.querySelector(s); };
 
-  var KEY='tows_mode';          /* 换键：丢掉旧品牌时期残留的 desktop 选择 */
-  var ua=navigator.userAgent||'';
-  var coarse=false, fine=false;
-  try{ coarse=window.matchMedia('(pointer:coarse)').matches; }catch(e){}
-  try{ fine=window.matchMedia('(pointer:fine)').matches; }catch(e){}
+  /* ↓↓↓ 如果两套界面改了文件名，只改这两行 ↓↓↓ */
+  var V = { desktop:'desktop.html', mobile:'mobile.html' };
+
+  var KEY = 'tows_mode';
+  var ua = navigator.userAgent || '';
+  var coarse = false, fine = false;
+  try{ coarse = window.matchMedia('(pointer:coarse)').matches; }catch(e){}
+  try{ fine   = window.matchMedia('(pointer:fine)').matches; }catch(e){}
 
   function param(n){ try{ return new URLSearchParams(location.search).get(n); }catch(e){ return null; } }
   function ls(k,v){
@@ -110,56 +113,50 @@ h1{font-size:25px;margin:15px 0 10px}.eyebrow{color:var(--tx2)}
     return null;
   }
 
-  var forced=param('mode');
+  var forced = param('mode');
   if(forced==='desktop'||forced==='mobile') ls(KEY,forced);
-  if(param('choose')!==null) ls(KEY,'');           /* ?choose 强制回到选择页 */
+  if(param('choose')!==null) ls(KEY,'');
 
   var isPhone  = /Android.*Mobile|iPhone|iPod|Windows Phone|HarmonyOS.*Mobile|Mobile Safari/i.test(ua);
   var isTablet = /iPad|Tablet|PlayBook|Silk|Android(?!.*Mobile)|Macintosh(?=.*Mobile)/i.test(ua);
-  /* 桌面 UA 但屏幕明显是手机尺寸 + 触屏 → 多半是手机开了「桌面版网站」，仍按手机处理 */
   var smallScreen = Math.min(screen.width||9999, screen.height||9999) <= 500;
 
-  var saved=ls(KEY);
-  var mode=saved;
-  if(mode!=='desktop'&&mode!=='mobile'){
-    if(isTablet) mode=null;                        /* 平板两种都合适 → 让用户选 */
-    else if(isPhone) mode='mobile';
-    else if(coarse&&!fine) mode='mobile';          /* 触屏且无精确指针 → 手机 */
-    else if(coarse&&smallScreen) mode='mobile';    /* 触屏小屏 → 手机 */
-    else mode='desktop';
+  function pickMode(){
+    var saved = ls(KEY);
+    if(saved==='desktop'||saved==='mobile') return saved;
+    if(isTablet) return null;
+    if(isPhone) return 'mobile';
+    if(coarse && !fine) return 'mobile';
+    if(coarse && smallScreen) return 'mobile';
+    return 'desktop';
   }
 
-  var fill=document.getElementById('fill');
-  var title=document.getElementById('title');
-  var sub=document.getElementById('sub');
-  var eyebrow=document.getElementById('eyebrow');
-  var mRight=document.getElementById('mRight');
+  var fill = $('#fill'), title = $('#title'), sub = $('#sub'),
+      eyebrow = $('#eyebrow'), mRight = $('#mRight');
 
   function go(m){
-    mRight.textContent=(m==='mobile'?'MOBILE SHELL':'DESKTOP SHELL');
-    if(fill) fill.style.width='100%';
-    setTimeout(function(){ location.replace(V[m]); },240);
+    mRight.textContent = (m==='mobile' ? 'MOBILE SHELL' : 'DESKTOP SHELL');
+    if(fill) fill.style.width = '100%';
+    setTimeout(function(){ location.replace(V[m]); }, 240);
   }
 
+  var mode = pickMode();
   if(mode){
-    title.textContent=(mode==='mobile'?'进入手机版':'进入电脑版');
-    sub.textContent=(mode==='mobile'?'全宽对话 · 底部输入 · 原生手势':'侧栏导航 · 完整工作台布局');
-    eyebrow.textContent='Loading interface';
-    try{
-      var l=document.createElement('link'); l.rel='prefetch'; l.href=V[mode];
-      document.head.appendChild(l);
-    }catch(e){}
-    if(fill) fill.style.width='62%';
+    title.textContent = (mode==='mobile' ? '进入手机版' : '进入电脑版');
+    sub.textContent   = (mode==='mobile' ? '全宽对话 · 底部输入 · 原生手势' : '侧栏导航 · 完整工作台布局');
+    eyebrow.textContent = 'Loading interface';
+    try{ var l=document.createElement('link'); l.rel='prefetch'; l.href=V[mode]; document.head.appendChild(l); }catch(e){}
+    if(fill) fill.style.width = '62%';
     go(mode);
   }else{
-    eyebrow.textContent='Select interface';
-    title.textContent='请选择要进入的版本';
-    sub.textContent='当前设备是平板或触屏电脑，两种界面都适合';
-    if(fill) fill.style.width='100%';
-    var box=document.getElementById('choose');
+    eyebrow.textContent = 'Select interface';
+    title.textContent = '请选择要进入的版本';
+    sub.textContent = '当前设备是平板或触屏电脑，两种界面都适合';
+    if(fill) fill.style.width = '100%';
+    var box = $('#choose');
     box.classList.add('on');
-    Array.prototype.forEach.call(box.querySelectorAll('button'),function(b){
-      b.addEventListener('click',function(){ ls(KEY,b.dataset.go); go(b.dataset.go); });
+    Array.prototype.forEach.call(box.querySelectorAll('button'), function(b){
+      b.addEventListener('click', function(){ ls(KEY, b.dataset.go); go(b.dataset.go); });
     });
   }
 })();
