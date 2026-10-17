@@ -111,7 +111,10 @@
       '<div class="sec-head">' +
         '<span class="sec-no">05</span>' +
         '<span class="sec-meta"><span class="sec-en">// Threads</span><span class="sec-cn">伏笔与时间线</span></span>' +
-        '<span class="sec-right"><button class="mini-btn" id="twsBtnNewThread">记一条</button></span>' +
+        '<span class="sec-right">' +
+          '<button class="mini-btn" id="twsBtnExtract">从本章提取</button>' +
+          '<button class="mini-btn" id="twsBtnNewThread">记一条</button>' +
+        '</span>' +
       '</div>' +
       '<div class="tws-tabs" id="twsThreadTabs"></div>' +
       '<div class="tws-thread-list" id="twsThreadList"></div>' +
@@ -588,6 +591,73 @@
     bar.querySelector('#idCopy').addEventListener('click', function () {
       if (!result) return;
       try { navigator.clipboard.writeText(result); toast('已复制'); } catch (e) { toast('复制失败'); }
+    });
+  }
+
+
+  /* ---------- 从本章正文提取伏笔与时间线 ---------- */
+  function openExtract() {
+    flushSave();
+    var pid = D.D.activeProject;
+    if (!pid) { toast('先建一部作品'); return; }
+    var c = ui.chapterId && D.getChapter(ui.chapterId);
+    if (!c) { toast('先去书稿选一章'); return; }
+    if (!(c.content || '').trim()) { toast('这一章还没有正文'); return; }
+    if (T.ai.needKey()) { needKeyGuide(); return; }
+
+    var m = modal('从「' + c.title + '」提取',
+      '<p class="tws-p">让 AI 读一遍这章正文，把埋下的伏笔和有明确时间感的事件整理出来。' +
+      '提取结果会先给你过目，你点确认才写入。</p>' +
+      '<div class="tws-ai-out" id="exOut" style="margin-top:12px">点下面的按钮开始</div>',
+      { footer: false });
+
+    var out = m.el.querySelector('#exOut');
+    var bar = document.createElement('div');
+    bar.className = 'tws-ai-bar';
+    bar.innerHTML = '<button class="tws-btn primary" id="exRun">开始提取</button>' +
+      '<span class="tws-spacer"></span>' +
+      '<button class="tws-btn sm" id="exOk" disabled>确认写入</button>';
+    m.el.querySelector('.tws-modal-b').appendChild(bar);
+
+    var ops = [];
+    bar.querySelector('#exRun').addEventListener('click', function () {
+      this.disabled = true;
+      out.textContent = '';
+      out.classList.add('streaming');
+      T.ai.extract(c, function (txt) {
+        out.textContent = txt;
+        out.scrollTop = out.scrollHeight;
+      }).then(function (full) {
+        out.classList.remove('streaming');
+        var parsed = T.ops.parse(full || out.textContent);
+        ops = parsed.ops;
+        bar.querySelector('#exRun').disabled = false;
+        if (!ops.length) {
+          out.textContent = '这一章里没找到可以归档的伏笔或时间线事件。';
+          return;
+        }
+        out.textContent = '';
+        var list = document.createElement('div');
+        list.innerHTML = ops.map(function (op) {
+          return '<div class="tws-opline"><i>' + esc(T.ops.LABEL[op.op] || op.op) + '</i>' +
+            esc(T.ops.describe(op).replace(/^(写入伏笔|写入时间线)/, '')) + '</div>';
+        }).join('');
+        out.appendChild(list);
+        bar.querySelector('#exOk').disabled = false;
+      }).catch(function (e) {
+        out.textContent = '提取失败：' + e.message;
+        out.classList.remove('streaming');
+        bar.querySelector('#exRun').disabled = false;
+      });
+    });
+
+    bar.querySelector('#exOk').addEventListener('click', function () {
+      if (!ops.length) return;
+      var r = runOps(ops);
+      m.close();
+      toast('已写入：' + r.done.join('、'));
+      if (ui.tab !== 'thread') { ui.tab = 'thread'; }
+      renderThreads();
     });
   }
 
@@ -1217,6 +1287,17 @@
           D.addThread(pid, op.name || '未命名', op.note || '', chId);
           done.push('伏笔「' + (op.name || '') + '」');
           opened.threads = true;
+
+        } else if (op.op === 'add_event') {
+          if (!pid) return;
+          var ecid = ui.chapterId || '';
+          if (op.chapter) {
+            var hit2 = allChapters(pid).filter(function (c) { return c.title === op.chapter; })[0];
+            if (hit2) ecid = hit2.id;
+          }
+          D.addEvent(pid, ecid, op.when || '', op.who || '', op.what || '');
+          done.push('时间线「' + (op.when || op.what || '') + '」');
+          opened.threads = true;
         }
       } catch (e) { console.warn('[TWS] 指令执行失败', op, e); }
     });
@@ -1378,6 +1459,7 @@
     $('twsGoalChip').addEventListener('click', openStats);
 
     $('twsBtnNewCard').addEventListener('click', function () { promptCard(null); });
+    $('twsBtnExtract').addEventListener('click', openExtract);
     $('twsBtnNewThread').addEventListener('click', function () {
       if (ui.tab === 'thread') promptThread(); else promptEvent();
     });

@@ -476,7 +476,8 @@
     '{"op":"create_novel","name":"书名","genre":"题材"}  建一本新书',
     '{"op":"add_chapter","title":"第一章 雪夜"}  新增章节（自动挂在最后一卷）',
     '{"op":"add_lore","kind":"character|place|term|relation","name":"名字","body":"描述","aliases":["别名"]}  写入设定库',
-    '{"op":"add_thread","name":"伏笔名","note":"埋了什么、准备怎么回收","plantChapter":"第一章 雪夜"}  写入伏笔'
+    '{"op":"add_thread","name":"伏笔名","note":"埋了什么、准备怎么回收","plantChapter":"第一章 雪夜"}  写入伏笔',
+    '{"op":"add_event","when":"第 3 天","who":"沈砚","what":"在断桥下发现了剑匣"}  写入时间线'
   ].join('\n');
 
   /* 从回复里拆出指令块 */
@@ -497,7 +498,8 @@
     create_novel: '建立新书',
     add_chapter: '新增章节',
     add_lore: '写入设定库',
-    add_thread: '写入伏笔'
+    add_thread: '写入伏笔',
+    add_event: '写入时间线'
   };
 
   /* 把一条指令变成人话 */
@@ -513,9 +515,36 @@
         return '设定库写入' + k + '「' + (op.name || '') + '」' + (op.body ? '：' + String(op.body).slice(0, 30) : '');
       case 'add_thread':
         return '伏笔「' + (op.name || '') + '」' + (op.plantChapter ? '（埋在 ' + op.plantChapter + '）' : '');
+      case 'add_event':
+        return '时间线' + (op.when ? '「' + op.when + '」' : '') + '：' + (op.what || '');
       default:
         return '';
     }
+  }
+
+
+  /* 从一章正文里拆出伏笔与时间线事件 */
+  function extract(chapter, onText) {
+    var body = (chapter && chapter.content || '').trim();
+    if (!body) return Promise.reject(new Error('这一章还没有正文'));
+    var sys = '你是小说编辑。从下面这段正文里提取两类信息：\n' +
+      '1. 伏笔：埋下但还没解释清楚的线索、悬念、暗示；\n' +
+      '2. 时间线事件：有明确时间感的「什么时候、谁、发生了什么」。\n\n' +
+      '只输出一个 tws 代码块，每行一条 JSON，不要任何解释：\n' +
+      '```tws\n' +
+      '{"op":"add_thread","name":"线索名","note":"埋了什么、可能怎么回收"}\n' +
+      '{"op":"add_event","when":"三年前","who":"沈砚","what":"师父被杀"}\n' +
+      '```\n\n' +
+      '规则：\n' +
+      '- 只提取正文里确实写到的，不要编造；\n' +
+      '- 伏笔只取「埋下但未解释」的，已经讲清楚的不算；\n' +
+      '- 时间线只取有明确时间感的（三年前 / 第二天 / 入夜后 / 三个月后…）；\n' +
+      '- 最多 6 条，宁少勿滥；\n' +
+      '- 什么都没提取到，就输出一个空的 tws 代码块。';
+    return callLLM([
+      { role: 'system', content: sys },
+      { role: 'user', content: body.slice(-6000) }
+    ], onText);
   }
 
   /* 无 Key 时的统一引导 */
@@ -527,6 +556,6 @@
   T.exporters = { docx: buildDocx, download: download, statusName: statusName };
   T.checker = { run: runCheck, callLLM: callLLM };
   T.ops = { parse: parseOps, describe: describeOp, LABEL: OP_LABEL, DOC: OP_DOC };
-  T.ai = { polish: polish, ideate: ideate, needKey: needKey,
+  T.ai = { polish: polish, ideate: ideate, extract: extract, needKey: needKey,
           POLISH_STYLES: POLISH_STYLES, IDEAS: IDEAS };
 })();
