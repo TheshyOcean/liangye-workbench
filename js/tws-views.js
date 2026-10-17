@@ -1724,9 +1724,14 @@
         var v = Number(range.value);
         var lv = tempLevel(v);
         var nm = TEMP_LEVELS[lv].name, vs = v.toFixed(1);
-        if (nameEl.textContent !== nm) replay(nameEl, 'swap');
-        if (valEl.textContent !== vs) replay(valEl, 'swap');
-        if (lastLv !== lv) { replay(descEl, 'swap'); lastLv = lv; }
+        /* 只有「档位」变化时才重放动画；数值每 0.1 都变，重放会一直闪 */
+        if (lastLv !== lv) {
+          if (lastLv !== -1) {
+            replay(nameEl, 'swap');
+            replay(descEl, 'swap');
+          }
+          lastLv = lv;
+        }
         nameEl.textContent = nm;
         valEl.textContent = vs;
         descEl.textContent = TEMP_LEVELS[lv].desc;

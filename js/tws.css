@@ -777,3 +777,37 @@
 @media (prefers-reduced-motion: reduce){
   .tws-pill-fill i{ animation: none !important; opacity: .5; }
 }
+
+/* ============================================================================
+   温度弹层 · 消除调节时的抖动/闪烁
+   原因：说明文字 1~2 行来回变导致弹层高度跳；刻度加粗导致字宽变；数值每次都重放动画
+   ========================================================================== */
+/* ① 说明区固定高度，永远两行，不再改变弹层高度 */
+.tws-temp-d{
+  height: 63px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ② 刻度等宽：加粗时不会把旁边的挤走 */
+.tws-temp-ticks span{
+  flex: 0 0 20%;
+  text-align: center;
+  white-space: nowrap;
+}
+.tws-temp-ticks span:first-child{ text-align: left; }
+.tws-temp-ticks span:last-child{ text-align: right; }
+
+/* ③ 弹层高度与位置稳定，避免重排时的闪动 */
+.tws-temp-pop{
+  contain: layout paint;
+}
+.tws-pill-fill{
+  will-change: width;
+}
+
+/* ④ 名称/说明切换改用更柔的曲线，减少视觉突变 */
+.tws-temp-h b.swap,
+.tws-temp-d.swap{
+  animation-duration: .2s;
+}
