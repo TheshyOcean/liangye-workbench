@@ -547,3 +547,85 @@
   display: flex; gap: 8px; padding: 9px 13px 11px;
   border-top: 1px solid color-mix(in srgb, var(--ac-text) 16%, transparent);
 }
+
+/* ============================================================================
+   温度选择器
+   ========================================================================== */
+.tws-temp-btn{
+  flex: none; display: inline-flex; align-items: center; gap: 4px;
+  height: 34px; padding: 0 10px; margin-right: 6px;
+  border: 1px solid var(--bd-s); background: transparent; color: var(--tx-2);
+  font-family: var(--mono); font-size: 11px; letter-spacing: .04em;
+  cursor: pointer; transition: border-color .16s, color .16s, background .16s;
+}
+.tws-temp-btn:hover{ border-color: var(--ac-text); color: var(--ac-text); background: var(--ac-sub); }
+.tws-temp-btn .tw{
+  font-size: 9px; opacity: .55; margin-right: 1px;
+}
+
+.tws-temp-pop{
+  position: fixed; z-index: 8500;
+  padding: 14px 15px 12px;
+  background: var(--bg-3);
+  border: 1px solid var(--bd-s);
+  border-top: 2px solid var(--ac);
+  clip-path: var(--chamfer-2);
+  box-shadow: 0 14px 40px rgba(0,0,0,.34);
+  animation: tws-pop .18s var(--studio-ease, cubic-bezier(.22,.8,.22,1));
+}
+@keyframes tws-pop{ from{ opacity: 0; transform: translateY(6px); } }
+
+.tws-temp-h{
+  display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px;
+}
+.tws-temp-h .ic{ color: var(--ac-text); font-size: 12px; }
+.tws-temp-h b{ font-size: 14px; font-weight: 600; color: var(--tx-1); }
+.tws-temp-h em{
+  margin-left: auto; font-style: normal;
+  font-family: var(--mono); font-size: 11px; color: var(--ac-text);
+}
+
+/* 滑块 */
+.tws-temp-pop input[type="range"]{
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px; margin: 0;
+  border: 0; outline: none; cursor: pointer;
+  background: var(--bd);
+}
+.tws-temp-pop input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance: none; appearance: none;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--bg-1); border: 2px solid var(--ac-text);
+  box-shadow: 0 0 0 3px var(--ac-sub);
+  cursor: grab;
+}
+.tws-temp-pop input[type="range"]::-moz-range-thumb{
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--bg-1); border: 2px solid var(--ac-text);
+  cursor: grab;
+}
+
+.tws-temp-ticks{
+  display: flex; justify-content: space-between;
+  margin-top: 9px;
+  font-size: 9.5px; letter-spacing: .04em; color: var(--tx-3);
+}
+.tws-temp-ticks span{ cursor: default; transition: color .16s; }
+.tws-temp-ticks span.on{ color: var(--ac-text); font-weight: 600; }
+
+.tws-temp-d{
+  margin-top: 11px; padding-top: 10px;
+  border-top: 1px solid var(--bd);
+  font-size: 11.5px; line-height: 1.75; color: var(--tx-2);
+  min-height: 42px;
+}
+
+.tws-temp-f{
+  display: flex; justify-content: flex-end; margin-top: 8px;
+}
+.tws-temp-f button{
+  border: 0; background: none; cursor: pointer; padding: 2px 0;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .06em;
+  color: var(--tx-3); transition: color .16s;
+}
+.tws-temp-f button:hover{ color: var(--ac-text); }

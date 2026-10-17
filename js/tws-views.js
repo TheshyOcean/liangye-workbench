@@ -1538,6 +1538,7 @@
 
     // 模板入口：挂在输入框上方（对话视图）
     addTemplateEntry();
+    mountTempPicker();
     addChapterChip();
     watchChat();
     addNav();
@@ -1601,6 +1602,125 @@
     chip.addEventListener('click', openChapterPicker);
     right.insertBefore(chip, right.firstChild);
     updateChapterChip();
+  }
+
+
+  /* ============================================================
+     温度选择器（输入区右下角，GPT 式弹层）
+     ============================================================ */
+  var TEMP_LEVELS = [
+    { max: 0.3, name: '严谨', desc: '用词保守，紧扣设定与前文，几乎不自由发挥。适合润色、改错、定稿前收口。' },
+    { max: 0.7, name: '稳妥', desc: '在合理范围内变化，优先保证情节连贯。日常续写最安全的选择。' },
+    { max: 1.1, name: '均衡', desc: '措辞与思路都有一定新鲜感，多数场景的默认值。' },
+    { max: 1.5, name: '放飞', desc: '用词跳跃，容易冒出意外的好句子，但也更容易跑偏。' },
+    { max: 2.0, name: '狂野', desc: '高度随机，适合头脑风暴找灵感，不建议直接定稿。' }
+  ];
+
+  function tempLevel(v) {
+    for (var i = 0; i < TEMP_LEVELS.length; i++) if (v <= TEMP_LEVELS[i].max) return i;
+    return TEMP_LEVELS.length - 1;
+  }
+  function curTemp() {
+    var S = window.__ENDF__ && window.__ENDF__.S;
+    var v = S && typeof S.temperature === 'number' ? S.temperature : 0.8;
+    return Math.max(0, Math.min(2, v));
+  }
+  function applyTemp(v) {
+    v = Math.round(v * 10) / 10;
+    try {
+      var api = window.__ENDF__;
+      api.S.temperature = v;
+      api.save && api.save();
+    } catch (e) {}
+    var tr = document.getElementById('tempRange'), tv = document.getElementById('tempVal');
+    if (tr) tr.value = String(v);
+    if (tv) tv.textContent = v.toFixed(1);
+  }
+
+  function mountTempPicker() {
+    var wrap = document.querySelector('.input-wrap');
+    if (!wrap || document.getElementById('twsTempBtn')) return;
+    var send = wrap.querySelector('.send');
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'twsTempBtn';
+    btn.className = 'tws-temp-btn';
+    btn.title = '温度 · 决定 AI 写得多保守或多放飞';
+    if (send) wrap.insertBefore(btn, send); else wrap.appendChild(btn);
+
+    function paintBtn() {
+      var v = curTemp();
+      btn.innerHTML = '<span class="tw">T</span>' + v.toFixed(1);
+    }
+    paintBtn();
+
+    var pop = null;
+    function closePop() { if (pop) { pop.remove(); pop = null; } }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (pop) { closePop(); return; }
+
+      pop = document.createElement('div');
+      pop.className = 'tws-temp-pop';
+      pop.innerHTML =
+        '<div class="tws-temp-h"><span class="ic">◐</span><b id="tpName">均衡</b><em id="tpVal">0.8</em></div>' +
+        '<input type="range" id="tpRange" min="0" max="2" step="0.1" value="' + curTemp() + '">' +
+        '<div class="tws-temp-ticks">' +
+          TEMP_LEVELS.map(function (l, i) {
+            return '<span data-lv="' + i + '">' + l.name + '</span>';
+          }).join('') +
+        '</div>' +
+        '<div class="tws-temp-d" id="tpDesc"></div>' +
+        '<div class="tws-temp-f"><button type="button" id="tpReset">恢复默认 0.8</button></div>';
+      document.body.appendChild(pop);
+
+      var r = btn.getBoundingClientRect();
+      var w = Math.min(300, window.innerWidth - 24);
+      pop.style.width = w + 'px';
+      pop.style.left = Math.max(12, Math.min(r.left - w + 44, window.innerWidth - w - 12)) + 'px';
+      pop.style.bottom = (window.innerHeight - r.top + 10) + 'px';
+
+      var range = pop.querySelector('#tpRange');
+      var nameEl = pop.querySelector('#tpName');
+      var valEl = pop.querySelector('#tpVal');
+      var descEl = pop.querySelector('#tpDesc');
+
+      function paint() {
+        var v = Number(range.value);
+        var lv = tempLevel(v);
+        nameEl.textContent = TEMP_LEVELS[lv].name;
+        valEl.textContent = v.toFixed(1);
+        descEl.textContent = TEMP_LEVELS[lv].desc;
+        pop.querySelectorAll('[data-lv]').forEach(function (s2, i) {
+          s2.classList.toggle('on', i === lv);
+        });
+        var pct = v / 2 * 100;
+        range.style.background =
+          'linear-gradient(90deg, var(--ac-text) 0%, var(--ac-text) ' + pct + '%, var(--bd) ' + pct + '%, var(--bd) 100%)';
+      }
+      paint();
+
+      range.addEventListener('input', function () {
+        paint();
+        applyTemp(Number(range.value));
+        paintBtn();
+      });
+      pop.querySelector('#tpReset').addEventListener('click', function () {
+        range.value = '0.8'; paint(); applyTemp(0.8); paintBtn();
+      });
+      pop.addEventListener('click', function (e2) { e2.stopPropagation(); });
+    });
+
+    document.addEventListener('click', closePop);
+    window.addEventListener('resize', closePop);
+    window.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePop(); });
+
+    /* 配置页改动时同步 */
+    var tr = document.getElementById('tempRange');
+    if (tr) tr.addEventListener('change', function () { paintBtn(); });
+    T.refreshTempBtn = paintBtn;
   }
 
   function addTemplateEntry() {
