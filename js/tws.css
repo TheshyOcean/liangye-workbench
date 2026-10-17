@@ -510,3 +510,40 @@
 .tws-lore-hint b{ color: var(--ac-text); }
 .tws-ai-out.streaming::after{ color: var(--ac-text); }
 .tws-ch-chip.on{ color: var(--ac-text); border-color: color-mix(in srgb, var(--ac-text) 45%, transparent); }
+
+/* ---------- AI 写入书稿：确认卡 ---------- */
+.tws-opcard{
+  margin: 8px 0 2px; max-width: min(560px, 100%);
+  border: 1px solid color-mix(in srgb, var(--ac-text) 40%, transparent);
+  background: var(--ac-sub);
+  clip-path: var(--chamfer-2-sm);
+  overflow: hidden;
+}
+.tws-opcard-h{
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 13px 8px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+  color: var(--ac-text); text-transform: uppercase;
+}
+.tws-opcard-h .sq{ width: 3px; height: 12px; background: var(--ac-text); flex: none; }
+.tws-opcard-h.done{ color: var(--sig-green, #7ADDB5); }
+.tws-opcard-h.done .sq{ background: var(--sig-green, #7ADDB5); }
+
+.tws-opcard-b{ padding: 0 13px 10px; }
+.tws-opline{
+  display: flex; gap: 8px; align-items: baseline;
+  padding: 5px 0; border-top: 1px solid color-mix(in srgb, var(--ac-text) 16%, transparent);
+  font-size: 12.5px; line-height: 1.6; color: var(--tx-2);
+}
+.tws-opline:first-child{ border-top: 0; }
+.tws-opline i{
+  font-style: normal; flex: none;
+  font-family: var(--mono); font-size: 9px; letter-spacing: .06em;
+  padding: 1px 5px; color: var(--ac-text);
+  border: 1px solid color-mix(in srgb, var(--ac-text) 38%, transparent);
+}
+
+.tws-opcard-f{
+  display: flex; gap: 8px; padding: 9px 13px 11px;
+  border-top: 1px solid color-mix(in srgb, var(--ac-text) 16%, transparent);
+}

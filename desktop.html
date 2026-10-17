@@ -1854,8 +1854,8 @@ html.kb-open .chat{padding-bottom:2px;}
   .anno-item i{max-width:110px;}
 }
 </style>
-<link rel="stylesheet" href="terminal-redesign.css?v=beta2.0.10-2">
-<link rel="stylesheet" href="js/tws.css?v=beta2.0.10-2">
+<link rel="stylesheet" href="terminal-redesign.css?v=beta2.0.10-3">
+<link rel="stylesheet" href="js/tws.css?v=beta2.0.10-3">
 </head>
 <body class="is-loading">
 
@@ -2757,6 +2757,26 @@ function buildMessages(conv){
   try{
     var _lore=(window.TWS&&window.TWS.lorePrompt)?window.TWS.lorePrompt():'';
     if(_lore) sys+='\n\n'+_lore;
+  }catch(e){}
+  /* 书稿写入通道：告诉 AI 当前书稿状态，以及怎么把内容整理进去 */
+  try{
+    if(window.TWS&&window.TWS.bookState&&window.TWS.ops){
+      sys+='\n\n【书稿状态】\n'+window.TWS.bookState();
+      sys+='\n\n【你能帮用户把内容整理进书稿】\n'+
+        '当对话里已经写出了可以归档的内容（一段情节、一个人物、一个地点、一个悬念），'+
+        '你可以主动提议把它整理进书稿。用户同意后，在回复的最末尾单独输出一个代码块：\n'+
+        '\n```tws\n{"op":"create_novel","name":"书名","genre":"题材"}\n```\n'+
+        '\n可用指令（一行一条，可以多条）：\n'+window.TWS.ops.DOC+
+        '\n\n规则：\n'+
+        '1. 先问，再做。一次只问一个问题，用日常说话的方式，不要提"指令""字段""JSON""系统"。\n'+
+        '2. 用户明确同意后，才输出 tws 代码块。\n'+
+        '3. 代码块放在回复最末尾，前面照常写你想说的话，不要解释这个代码块。\n'+
+        '4. 刚建好书时，主动帮他起几个章节名并列出，问要不要一起加进去。\n'+
+        '5. 写到新人物的外貌/性格/关系，或新地点、专有名词时，主动提议写进设定库，'+
+        '并顺带说一句"以后想改就去设定库里改"。\n'+
+        '6. 埋了悬念或暗示时，主动提议记成伏笔，并说一句"以后去伏笔页改"。\n'+
+        '7. 一次最多 4 条指令，不要一口气全塞进去。';
+    }
   }catch(e){}
   if(sys.trim()) msgs.push({role:'system',content:sys});
   conv.msgs.forEach(function(m){
@@ -4232,9 +4252,9 @@ window.__ENDF__={S:S,save:save,renderDrawer:renderDrawer,renderChat:renderChat,g
 
 })();
 </script>
-<script src="terminal-redesign.js?v=beta2.0.10-2"></script>
-<script src="js/tws-data.js?v=beta2.0.10-2"></script>
-<script src="js/tws-features.js?v=beta2.0.10-2"></script>
-<script src="js/tws-views.js?v=beta2.0.10-2"></script>
+<script src="terminal-redesign.js?v=beta2.0.10-3"></script>
+<script src="js/tws-data.js?v=beta2.0.10-3"></script>
+<script src="js/tws-features.js?v=beta2.0.10-3"></script>
+<script src="js/tws-views.js?v=beta2.0.10-3"></script>
 </body>
 </html>

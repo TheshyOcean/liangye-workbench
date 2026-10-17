@@ -1152,11 +1152,145 @@
     });
   }
 
+
+  /* ============================================================
+     AI 写入书稿：状态摘要 + 确认卡 + 执行
+     ============================================================ */
+  /* 给提示词用的当前书稿状态 */
+  function bookState() {
+    var pid = D.D.activeProject;
+    var p = pid && D.getProject(pid);
+    if (!p) return '当前还没有作品。';
+    var vols = D.listVolumes(pid);
+    var chs = allChapters(pid);
+    var lines = ['当前作品：《' + p.name + '》' + (p.genre ? '（' + p.genre + '）' : '') +
+      ' · ' + vols.length + ' 卷 · ' + chs.length + ' 章 · ' + D.fmtNum(D.projectWords(pid)) + ' 字'];
+    if (chs.length) {
+      lines.push('章节：' + chs.slice(-6).map(function (c) {
+        return c.title + '（' + T.exporters.statusName(c.status) + ' ' + (c.words || 0) + '字）';
+      }).join('、') + (chs.length > 6 ? ' …' : ''));
+    }
+    var lore = D.listCards(pid).length;
+    var th = D.listThreads(pid).length;
+    lines.push('设定库 ' + lore + ' 条 · 伏笔 ' + th + ' 条');
+    return lines.join('\n');
+  }
+
+  /* 执行一批指令 */
+  function runOps(ops) {
+    var pid = D.D.activeProject;
+    var done = [], opened = { book: false, lore: false, threads: false };
+
+    ops.forEach(function (op) {
+      if (!op || !op.op) return;
+      try {
+        if (op.op === 'create_novel') {
+          var np = D.addProject(op.name || '未命名作品', op.genre || '');
+          D.addVolume(np.id, '第一卷');
+          pid = np.id;
+          done.push('《' + np.name + '》已建好');
+          opened.book = true;
+
+        } else if (op.op === 'add_chapter') {
+          if (!pid) return;
+          var vols = D.listVolumes(pid);
+          if (!vols.length) vols = [D.addVolume(pid, '第一卷')];
+          D.addChapter(vols[vols.length - 1].id, op.title || '新章节');
+          done.push('章节「' + (op.title || '') + '」');
+          opened.book = true;
+
+        } else if (op.op === 'add_lore') {
+          if (!pid) return;
+          var kind = ['character', 'place', 'term', 'relation'].indexOf(op.kind) >= 0 ? op.kind : 'character';
+          var c = D.addCard(pid, kind, op.name || '未命名', op.body || '', {}, op.aliases || []);
+          D.updateCard(c.id, { on: 1 });   /* 默认带上，下次续写自动注入 */
+          done.push('设定「' + (op.name || '') + '」');
+          opened.lore = true;
+
+        } else if (op.op === 'add_thread') {
+          if (!pid) return;
+          var chId = '';
+          if (op.plantChapter) {
+            var hit = allChapters(pid).filter(function (c) { return c.title === op.plantChapter; })[0];
+            if (hit) chId = hit.id;
+          }
+          D.addThread(pid, op.name || '未命名', op.note || '', chId);
+          done.push('伏笔「' + (op.name || '') + '」');
+          opened.threads = true;
+        }
+      } catch (e) { console.warn('[TWS] 指令执行失败', op, e); }
+    });
+
+    /* 兜底：新建了书但一条章节指令都没有，补一个空章节，免得用户进去是死路 */
+    if (pid && !allChapters(pid).length) {
+      var v0 = D.listVolumes(pid)[0] || D.addVolume(pid, '第一卷');
+      D.addChapter(v0.id, '第一章');
+    }
+
+    renderTree(); renderLore(); renderThreads(); renderGoalChip();
+    return { done: done, opened: opened };
+  }
+
+  /* 把某条消息里的指令块藏起来，换成确认卡 */
+  function scanOps() {
+    var chat = document.getElementById('chat');
+    if (!chat) return;
+    chat.querySelectorAll('.msg.ai').forEach(function (el) {
+      if (el.querySelector('.tws-opcard')) return;
+      var ans = el.querySelector('.ans');
+      if (!ans) return;
+      var pre = null;
+      ans.querySelectorAll('pre').forEach(function (x) {
+        if (!pre && /^\s*tws\s*\n?\s*\{/.test(x.textContent)) pre = x;
+      });
+      if (!pre) return;
+
+      var parsed = T.ops.parse('```tws' + pre.textContent.replace(/^\s*tws/, '') + '```');
+      if (!parsed.ops.length) return;
+
+      pre.style.display = 'none';   /* 原始 JSON 不给用户看 */
+
+      var card = document.createElement('div');
+      card.className = 'tws-opcard';
+      card.innerHTML =
+        '<div class="tws-opcard-h"><span class="sq"></span>AI 想把这段整理进书稿</div>' +
+        '<div class="tws-opcard-b">' +
+          parsed.ops.map(function (op) {
+            return '<div class="tws-opline"><i>' + esc(T.ops.LABEL[op.op] || op.op) + '</i>' +
+              esc(T.ops.describe(op).replace(/^(建立新书|新增章节|写入设定库|写入伏笔)/, '')) + '</div>';
+          }).join('') +
+        '</div>' +
+        '<div class="tws-opcard-f">' +
+          '<button class="tws-btn primary sm" data-op-ok>好，加进去</button>' +
+          '<button class="tws-btn sm ghost" data-op-no>先不用</button>' +
+        '</div>';
+
+      card.querySelector('[data-op-ok]').addEventListener('click', function (e) {
+        e.stopPropagation();
+        var r = runOps(parsed.ops);
+        card.innerHTML = '<div class="tws-opcard-h done"><span class="sq"></span>已写入：' + esc(r.done.join('、')) + '</div>' +
+          '<div class="tws-opcard-b"><div class="tws-opline" style="border:0">' +
+          (r.opened.book ? '书稿里能看到 · ' : '') +
+          (r.opened.lore ? '设定库已同步（默认已勾选「带上」）· ' : '') +
+          (r.opened.threads ? '伏笔已记录 · ' : '') +
+          '要改就去对应页面改。</div></div>';
+        toast('已加入书稿');
+      });
+
+      card.querySelector('[data-op-no]').addEventListener('click', function (e) {
+        e.stopPropagation();
+        card.remove();
+      });
+
+      ans.parentNode.insertBefore(card, ans.nextSibling);
+    });
+  }
+
   function watchChat() {
     var chat = document.getElementById('chat');
     if (!chat) return;
-    injectAdoptButtons();
-    var mo = new MutationObserver(function () { injectAdoptButtons(); });
+    injectAdoptButtons(); scanOps();
+    var mo = new MutationObserver(function () { injectAdoptButtons(); scanOps(); });
     mo.observe(chat, { childList: true, subtree: true });
   }
 
@@ -1205,6 +1339,8 @@
   window.TWS_soon = function () { toast('此功能暂未上线敬请期待'); };
   T.lorePrompt = function () { return D.lorePrompt(); };
   T.snapConv = snapConv;
+  T.bookState = bookState;
+  T.runOps = runOps;
 
   /* ============================================================
      挂载

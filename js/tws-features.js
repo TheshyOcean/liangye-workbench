@@ -466,6 +466,58 @@
     ], onText);
   }
 
+
+  /* ============================================================
+     ⑤ AI 写入书稿的指令通道
+     AI 在回复末尾输出 ```tws 代码块（每行一条 JSON），
+     页面把它藏起来、换成一张确认卡，用户点了才真正写入。
+     ============================================================ */
+  var OP_DOC = [
+    '{"op":"create_novel","name":"书名","genre":"题材"}  建一本新书',
+    '{"op":"add_chapter","title":"第一章 雪夜"}  新增章节（自动挂在最后一卷）',
+    '{"op":"add_lore","kind":"character|place|term|relation","name":"名字","body":"描述","aliases":["别名"]}  写入设定库',
+    '{"op":"add_thread","name":"伏笔名","note":"埋了什么、准备怎么回收","plantChapter":"第一章 雪夜"}  写入伏笔'
+  ].join('\n');
+
+  /* 从回复里拆出指令块 */
+  function parseOps(text) {
+    var s = String(text || '');
+    var m = s.match(/```tws\s*([\s\S]*?)```/);
+    if (!m) return { ops: [], clean: s };
+    var ops = [];
+    m[1].split('\n').forEach(function (line) {
+      line = line.trim();
+      if (!line || line.charAt(0) !== '{') return;
+      try { ops.push(JSON.parse(line)); } catch (e) {}
+    });
+    return { ops: ops, clean: (s.slice(0, m.index) + s.slice(m.index + m[0].length)).trim() };
+  }
+
+  var OP_LABEL = {
+    create_novel: '建立新书',
+    add_chapter: '新增章节',
+    add_lore: '写入设定库',
+    add_thread: '写入伏笔'
+  };
+
+  /* 把一条指令变成人话 */
+  function describeOp(op) {
+    if (!op || !op.op) return '';
+    switch (op.op) {
+      case 'create_novel':
+        return '新建小说《' + (op.name || '未命名') + '》' + (op.genre ? '（' + op.genre + '）' : '');
+      case 'add_chapter':
+        return '新增章节「' + (op.title || '未命名') + '」';
+      case 'add_lore':
+        var k = { character: '人物', place: '地点', term: '名词', relation: '关系' }[op.kind] || '设定';
+        return '设定库写入' + k + '「' + (op.name || '') + '」' + (op.body ? '：' + String(op.body).slice(0, 30) : '');
+      case 'add_thread':
+        return '伏笔「' + (op.name || '') + '」' + (op.plantChapter ? '（埋在 ' + op.plantChapter + '）' : '');
+      default:
+        return '';
+    }
+  }
+
   /* 无 Key 时的统一引导 */
   function needKey() {
     return !(window.__ENDF__ && window.__ENDF__.S && window.__ENDF__.S.apiKey);
@@ -474,6 +526,7 @@
   T.templates = { LIST: TEMPLATES, STYLES: STYLES, build: buildPrompt };
   T.exporters = { docx: buildDocx, download: download, statusName: statusName };
   T.checker = { run: runCheck, callLLM: callLLM };
+  T.ops = { parse: parseOps, describe: describeOp, LABEL: OP_LABEL, DOC: OP_DOC };
   T.ai = { polish: polish, ideate: ideate, needKey: needKey,
           POLISH_STYLES: POLISH_STYLES, IDEAS: IDEAS };
 })();
